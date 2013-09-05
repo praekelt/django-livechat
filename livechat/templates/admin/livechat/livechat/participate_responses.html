@@ -1,0 +1,15 @@
+{% if comment %}
+    {% if comment.livechatresponse_set.exists %}
+        <h2>Response:</h2>
+        {% for response in comment.livechatresponse_set.all %}
+            <div class="{% cycle 'row1' 'row2' %}" style="padding:10px 50px">
+                <label><strong>Author:</strong></label>
+                <p>{{response.author}}</p>
+                <label><strong>Response:</strong></label>
+                <p>{{response.response}}</p>
+                <label><strong>Time posted:</strong></label>
+                <p>{{response.created_at}}</p>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endif %}

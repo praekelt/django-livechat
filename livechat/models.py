@@ -1,9 +1,12 @@
 from django.db import models
 from django.contrib.sites.models import Site
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes import generic
 from django.contrib import comments
 
+
 Comment = comments.get_model()
+
 
 class SiteManager(models.Manager):
 
@@ -11,8 +14,14 @@ class SiteManager(models.Manager):
         qs = super(SiteManager, self).get_query_set(*args, **kwargs)
         return qs.filter(sites=Site.objects.get_current(), published=True)
 
+
 class LiveChat(models.Model):
-    article = models.ForeignKey('jmboarticles.Article', null=True, blank=True)
+    # Use a generic foreign key mechanism to be able to link livechats to any
+    # content type.
+    content_type = models.ForeignKey(ContentType)
+    object_id = models.PositiveIntegerField()
+    content_object = generic.GenericForeignKey('content_type', 'object_id')
+
     published = models.BooleanField(default=True)
     active = models.BooleanField(default=True)
     title = models.CharField(max_length=255)
@@ -37,7 +46,8 @@ class LiveChat(models.Model):
 class LiveChatResponse(models.Model):
     livechat = models.ForeignKey(LiveChat)
     author = models.ForeignKey('auth.User')
-    comment = models.ForeignKey(Comment)
+    comment = models.ForeignKey(Comment,
+            limit_choices_to={'object_pk':livechat})
     response = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

@@ -1,0 +1,209 @@
+{% load comments %}
+{% load livechat_tags %}
+
+{% get_livechat_page livechat "page" %}
+
+
+<h2 id="comment_list">{{livechat.title}}</h2>
+
+<p>
+    {{livechat.description|safe}}
+</p>
+
+{% if livechat.active %}
+
+    <div class="wrap" id="comment_form">
+        {% if user.is_authenticated %}
+
+            {% get_comment_form for livechat as form %}
+
+            <form action="{% comment_form_target %}" method="post">
+                {% csrf_token %}
+                <div style="display:none;">
+                    {{ form.content_type }}
+                    {{ form.object_pk }}
+                    {{ form.timestamp }}
+                    {{ form.security_hash }}
+                    {{ form.honeypot }}
+                    <input type="hidden" name="next" value="{{ current_url }}?&amp;answered={{answered}}&amp;popular={{popular}}" />
+                </div>
+
+                <p>
+                    Write your comment:
+                    <br/>Name:
+                    <strong>
+                        {% if user.get_profile.comment_as_anon %}
+                            Anon.
+                        {% else %}
+                            {% if user.get_profile.fullname %}
+                                {{ user.get_profile.fullname }}</a>
+                            {% else %}
+                                Anon.
+                            {% endif %}
+                        {% endif %}
+                    </strong>
+                    <div class="form-fields">
+                    {{ form.comment }}
+                    </div>
+                </p>
+                <p>
+                    <input type="submit" class="btn" name="post" value="Comment" />
+                </p>
+            </form>
+
+        {% else %}
+            <p><a href="{% url login %}?next={{request.path}}">Sign in</a> or <a href="{% url registration_register %}?next={{request.path}}">register</a> to chat.</p>
+        {% endif %}
+    </div>
+
+{% endif %}
+
+<div class="comment-rules">
+    <div><strong>Help keep your MAMA livechat clean:
+        <span class="tag report"><a href="#">Report</a></span>
+        any comments that are abusive, inappropriate, chat or
+        break any of our other commenting rules.
+        </strong>
+    </div>
+    <div>3 separate reports and the comment will be removed.</div>
+    <div><strong>Don't know the rules?</strong> <a href="/rules/">Read them here.</a></div>
+</div>
+
+
+
+{% if user.is_authenticated %}
+{% get_mylivechat livechat %}
+<h2 id="comment_list">My Questions</h2>
+<div class="comment_list">
+{% for comment in my_comments %}
+    <div class="comment {% cycle 'even' 'odd' %}">
+    <div>{{ comment.submit_date|date:"D, j M Y, H:i" }}</div>
+    <div>{% spaceless %}
+        {% if comment.is_community_moderated %}
+            <strong>Moderated:</strong> {{ comment.community_moderation_flags.latest.reason }}
+        {% else %}
+            {% if comment.is_moderated %}
+                <strong>Moderated:</strong> {{ comment.moderation_flags.latest.reason }}
+            {% else %}
+                {{ comment.comment }}
+            {% endif %}
+        {% endif %}{% endspaceless %}
+    </div>
+
+    <div>
+        <span class="likes">
+            {{ comment.like_count }} Like{{ comment.like_count|pluralize }}
+        </span>
+    </div>
+    {% if comment.livechatresponse_set.exists %}
+    <div class="livechatresponses">
+        {% for response in comment.livechatresponse_set.all %}
+            <div class="t {% cycle 'even' 'odd' %}">
+            <span>
+                <strong>{{response.author.first_name}}</strong>
+                -
+                {{ response.updated_at|date:"D, j M Y, H:i" }}
+            </span><br/>
+            <span>{{response.response}}</span>
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    </div>
+{% empty %}
+You haven't asked any questions.
+{% endfor %}
+</div>
+{% endif %}
+
+<h2 id="comment_list">Questions</h2>
+<p>
+    <strong>Display: </strong>
+    <a href="{{request.path}}">all questions</a>,
+    <a href="?answered=true">questions with answers</a>,
+    <a href="?answered=false">questions without answers</a> or
+    <a href="?popular=true">most popular questions first</a>.
+</p>
+<div class="comment_list">
+    {% for comment in page.object_list %}
+    <div class="comment {% cycle 'even' 'odd' %}">
+        <div>
+            <strong>
+                {% if comment.user.get_profile.comment_as_anon %}
+                    Anon.
+                {% else %}
+                    {% if comment.user.get_profile.fullname %}
+                        <a href="{% url profile_view comment.user.pk %}">{{ comment.user.get_profile.fullname }}</a>
+                    {% else %}
+                        Anon.
+                    {% endif %}
+                {% endif %}
+            </strong>
+         -
+
+        {{ comment.submit_date|date:"D, j M Y, H:i" }}
+        </div>
+
+        <div>{% spaceless %}
+            {% if comment.is_community_moderated %}
+                <strong>Moderated:</strong> {{ comment.community_moderation_flags.latest.reason }}
+            {% else %}
+                {% if comment.is_moderated %}
+                    <strong>Moderated:</strong> {{ comment.moderation_flags.latest.reason }}
+                {% else %}
+                    {{ comment.comment }}
+                {% endif %}
+            {% endif %}{% endspaceless %}
+        </div>
+
+        <div>
+            <span class="likes">
+                {{ comment.like_count }} Like{{ comment.like_count|pluralize }}
+            </span>
+            {% if user.is_authenticated %}
+              {% comment %}
+                <span class="tag"><a href="{% url comment_like comment.pk %}">+Like</a></span>
+                <span class="tag report"><a href="{% url comment_flag comment.pk %}">Report</a></span>
+              {% endcomment %}
+                <span class="reports tag">
+                    {% with flag_count=comment.community_moderation_flags.latest.flag_count %}
+                    {% if flag_count %}{{ flag_count }}{% else%} 0 {%endif%}
+                    {% endwith %}
+                </span>
+            {% endif %}
+        </div>
+        {% if comment.livechatresponse_set.exists %}
+        <div class="livechatresponses">
+            {% for response in comment.livechatresponse_set.all %}
+                <div class="t {% cycle 'even' 'odd' %}">
+                <span>
+                    <strong>{{response.author.first_name}}</strong>
+                    -
+                    {{ response.updated_at|date:"D, j M Y, H:i" }}
+                </span><br/>
+                <span>{{response.response}}</span>
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        </div>
+    {% endfor %}
+</div>
+
+<div id="pagination">
+    {% if page.has_previous %}
+        <span><a href="?p={{page.previous_page_number}}&amp;answered={{answered}}&amp;popular={{popular}}">Previous</a></span> |
+    {% else %}
+        <span>Previous</span> |
+    {% endif %}
+
+    <span class="current">
+        Page {{ page.number }} of {{ page.paginator.num_pages }}
+    </span>
+
+    {% if page.has_next %}
+        | <span><a href="?p={{page.next_page_number}}&amp;answered={{answered}}&amp;popular={{popular}}">Next</a></span>
+    {% else %}
+        | <span>Next</span>
+    {% endif %}
+</div>

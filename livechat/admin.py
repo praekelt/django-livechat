@@ -3,14 +3,12 @@ from django.contrib import admin
 from django.core.paginator import Paginator
 from django import forms
 
-from jmboarticles.models import Article
 from livechat.models import LiveChat, LiveChatResponse
 
 
 class LiveChatAdminForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(LiveChatAdminForm, self).__init__(*args, **kwargs)
-        self.fields['article'].queryset = Article.objects.order_by('title')
 
     class Meta:
         model = LiveChat
@@ -20,22 +18,34 @@ class LiveChatAdmin(admin.ModelAdmin):
     form = LiveChatAdminForm
 
     list_filter = ['published', 'active', 'sites', 'created_at']
-    list_display = ['article', 'title', 'active']
+    list_display = ['title', 'active']
     fields = (
         'published',
         'active',
-        'article',
         'title',
         'description',
         'sites',
     )
+    
+    def has_add_permission(self, request):
+        """ We will be adding livechats where it is needed by declaring an
+        inline admin model for it for the relevant content type. For an example,
+        see the AskMAMA project's mama/admin.py module.
+        """
+        return False
 
     def get_urls(self):
         urls = super(LiveChatAdmin, self).get_urls()
         from django.conf.urls.defaults import patterns
         my_urls = patterns('',
-            (r'^(?P<pk>\d+)/participate/$', self.admin_site.admin_view(self.participate), {}, "livechat"),
-            (r'^(?P<pk>\d+)/participate_responses/$', self.admin_site.admin_view(self.participate_responses), {}, "participate_responses"),
+            (r'^(?P<pk>\d+)/participate/$', 
+                self.admin_site.admin_view(self.participate), 
+                {}, 
+                "livechat"),
+            (r'^(?P<pk>\d+)/participate_responses/$', 
+                self.admin_site.admin_view(self.participate_responses), 
+                {}, 
+                "participate_responses"),
         )
         return my_urls + urls
 
@@ -66,20 +76,19 @@ class LiveChatAdmin(admin.ModelAdmin):
     def participate_responses(self, request, pk):
         try:
             livechat = LiveChat.objects.get(pk=pk)
-            comment = livechat.comment_set().get(pk=request.GET.get('comment_id'))
+            comment = livechat.comment_set().get(
+                pk=request.GET.get('comment_id'))
         except Comment.DoesNotExist, e:
             comment = None
-        except Article.DoesNotExist, e:
+        except ObjectDoesNotExist, e:
             comment = None
 
-        return render(request, "admin/livechat/livechat/participate_responses.html", {
-            'comment': comment
-        })
+        return render(request, 
+                      "admin/livechat/livechat/participate_responses.html", 
+                      {
+                          'comment': comment
+                      })
 
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == 'article':
-            kwargs['queryset'] = Article.published_objects.all()
-        return super(LiveChatAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
 class LiveChatResponseAdmin(admin.ModelAdmin):
     raw_id_fields = ['comment', 'livechat']
@@ -95,6 +104,7 @@ class LiveChatResponseAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         obj.author = request.user
         obj.save()
+
 
 admin.site.register(LiveChat, LiveChatAdmin)
 admin.site.register(LiveChatResponse, LiveChatResponseAdmin)
