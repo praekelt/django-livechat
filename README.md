@@ -38,3 +38,5 @@ The following settings must be added to settings.py:
     INSTALLED_APPS += (
         'livechat',
     )
+=======
+Live chat module that integrates with django
