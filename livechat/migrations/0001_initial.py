@@ -10,26 +10,10 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding model 'LiveChat'
         db.create_table('livechat_livechat', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('content_type', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['contenttypes.ContentType'])),
-            ('object_id', self.gf('django.db.models.fields.PositiveIntegerField')()),
-            ('published', self.gf('django.db.models.fields.BooleanField')(default=True)),
-            ('active', self.gf('django.db.models.fields.BooleanField')(default=True)),
-            ('title', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('description', self.gf('django.db.models.fields.TextField')()),
-            ('created_at', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('updated_at', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
+            ('modelbase_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['jmbo.ModelBase'], unique=True, primary_key=True)),
+            ('object_id', self.gf('django.db.models.fields.PositiveIntegerField')(null=True)),
         ))
         db.send_create_signal('livechat', ['LiveChat'])
-
-        # Adding M2M table for field sites on 'LiveChat'
-        m2m_table_name = db.shorten_name('livechat_livechat_sites')
-        db.create_table(m2m_table_name, (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('livechat', models.ForeignKey(orm['livechat.livechat'], null=False)),
-            ('site', models.ForeignKey(orm['sites.site'], null=False))
-        ))
-        db.create_unique(m2m_table_name, ['livechat_id', 'site_id'])
 
         # Adding model 'LiveChatResponse'
         db.create_table('livechat_livechatresponse', (
@@ -47,9 +31,6 @@ class Migration(SchemaMigration):
     def backwards(self, orm):
         # Deleting model 'LiveChat'
         db.delete_table('livechat_livechat')
-
-        # Removing M2M table for field sites on 'LiveChat'
-        db.delete_table(db.shorten_name('livechat_livechat_sites'))
 
         # Deleting model 'LiveChatResponse'
         db.delete_table('livechat_livechatresponse')
@@ -85,6 +66,21 @@ class Migration(SchemaMigration):
             'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'}),
             'username': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'})
         },
+        'category.category': {
+            'Meta': {'ordering': "('title',)", 'object_name': 'Category'},
+            'color': ('django.db.models.fields.CharField', [], {'default': "'yorange'", 'max_length': '64', 'null': 'True', 'blank': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'parent': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['category.Category']", 'null': 'True', 'blank': 'True'}),
+            'slug': ('django.db.models.fields.SlugField', [], {'unique': 'True', 'max_length': '255'}),
+            'title': ('django.db.models.fields.CharField', [], {'max_length': '200'})
+        },
+        'category.tag': {
+            'Meta': {'ordering': "('title',)", 'object_name': 'Tag'},
+            'categories': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'to': "orm['category.Category']", 'null': 'True', 'blank': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'slug': ('django.db.models.fields.SlugField', [], {'unique': 'True', 'max_length': '255'}),
+            'title': ('django.db.models.fields.CharField', [], {'max_length': '200'})
+        },
         'comments.comment': {
             'Meta': {'ordering': "('submit_date',)", 'object_name': 'Comment', 'db_table': "'django_comments'"},
             'comment': ('django.db.models.fields.TextField', [], {'max_length': '3000'}),
@@ -108,18 +104,42 @@ class Migration(SchemaMigration):
             'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
-        'livechat.livechat': {
-            'Meta': {'ordering': "['-published', '-created_at']", 'object_name': 'LiveChat'},
-            'active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
-            'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'description': ('django.db.models.fields.TextField', [], {}),
+        'jmbo.modelbase': {
+            'Meta': {'ordering': "('-created',)", 'object_name': 'ModelBase'},
+            'anonymous_comments': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
+            'anonymous_likes': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
+            'categories': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'to': "orm['category.Category']", 'null': 'True', 'blank': 'True'}),
+            'class_name': ('django.db.models.fields.CharField', [], {'max_length': '32', 'null': 'True'}),
+            'comments_closed': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'comments_enabled': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
+            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']", 'null': 'True'}),
+            'created': ('django.db.models.fields.DateTimeField', [], {'blank': 'True'}),
+            'crop_from': ('django.db.models.fields.CharField', [], {'default': "'center'", 'max_length': '10', 'blank': 'True'}),
+            'date_taken': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
+            'description': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+            'effect': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'modelbase_related'", 'null': 'True', 'to': "orm['photologue.PhotoEffect']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'object_id': ('django.db.models.fields.PositiveIntegerField', [], {}),
-            'published': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'sites': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['sites.Site']", 'symmetrical': 'False'}),
-            'title': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'updated_at': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'})
+            'image': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'blank': 'True'}),
+            'likes_closed': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'likes_enabled': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
+            'modified': ('django.db.models.fields.DateTimeField', [], {}),
+            'owner': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']", 'null': 'True', 'blank': 'True'}),
+            'primary_category': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'primary_modelbase_set'", 'null': 'True', 'to': "orm['category.Category']"}),
+            'publish_on': ('django.db.models.fields.DateTimeField', [], {'db_index': 'True', 'null': 'True', 'blank': 'True'}),
+            'publishers': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'to': "orm['publisher.Publisher']", 'null': 'True', 'blank': 'True'}),
+            'retract_on': ('django.db.models.fields.DateTimeField', [], {'db_index': 'True', 'null': 'True', 'blank': 'True'}),
+            'sites': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'to': "orm['sites.Site']", 'null': 'True', 'blank': 'True'}),
+            'slug': ('django.db.models.fields.SlugField', [], {'unique': 'True', 'max_length': '255'}),
+            'state': ('django.db.models.fields.CharField', [], {'default': "'unpublished'", 'max_length': '32', 'null': 'True', 'blank': 'True'}),
+            'subtitle': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '200', 'null': 'True', 'blank': 'True'}),
+            'tags': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'to': "orm['category.Tag']", 'null': 'True', 'blank': 'True'}),
+            'title': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
+            'view_count': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'})
+        },
+        'livechat.livechat': {
+            'Meta': {'ordering': "['-publish_on', '-created']", 'object_name': 'LiveChat', '_ormbases': ['jmbo.ModelBase']},
+            'modelbase_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['jmbo.ModelBase']", 'unique': 'True', 'primary_key': 'True'}),
+            'object_id': ('django.db.models.fields.PositiveIntegerField', [], {'null': 'True'})
         },
         'livechat.livechatresponse': {
             'Meta': {'ordering': "['created_at']", 'object_name': 'LiveChatResponse'},
@@ -130,6 +150,36 @@ class Migration(SchemaMigration):
             'livechat': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['livechat.LiveChat']"}),
             'response': ('django.db.models.fields.TextField', [], {}),
             'updated_at': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'})
+        },
+        'photologue.photoeffect': {
+            'Meta': {'object_name': 'PhotoEffect'},
+            'background_color': ('django.db.models.fields.CharField', [], {'default': "'#FFFFFF'", 'max_length': '7'}),
+            'brightness': ('django.db.models.fields.FloatField', [], {'default': '1.0'}),
+            'color': ('django.db.models.fields.FloatField', [], {'default': '1.0'}),
+            'contrast': ('django.db.models.fields.FloatField', [], {'default': '1.0'}),
+            'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'filters': ('django.db.models.fields.CharField', [], {'max_length': '200', 'blank': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'}),
+            'reflection_size': ('django.db.models.fields.FloatField', [], {'default': '0'}),
+            'reflection_strength': ('django.db.models.fields.FloatField', [], {'default': '0.6'}),
+            'sharpness': ('django.db.models.fields.FloatField', [], {'default': '1.0'}),
+            'transpose_method': ('django.db.models.fields.CharField', [], {'max_length': '15', 'blank': 'True'})
+        },
+        'publisher.publisher': {
+            'Meta': {'object_name': 'Publisher'},
+            'class_name': ('django.db.models.fields.CharField', [], {'max_length': '32', 'null': 'True'}),
+            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']", 'null': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'title': ('django.db.models.fields.CharField', [], {'max_length': '64'})
+        },
+        'secretballot.vote': {
+            'Meta': {'unique_together': "(('token', 'content_type', 'object_id'),)", 'object_name': 'Vote'},
+            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'object_id': ('django.db.models.fields.PositiveIntegerField', [], {}),
+            'token': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
+            'vote': ('django.db.models.fields.SmallIntegerField', [], {})
         },
         'sites.site': {
             'Meta': {'ordering': "('domain',)", 'object_name': 'Site', 'db_table': "'django_site'"},

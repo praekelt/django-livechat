@@ -1,0 +1,17 @@
+{% if live_chat_advert %}
+<div class="text_banner">
+  <div class="banner_content live_chat">
+    <div>
+      <strong>
+        <a href="{{ live_chat_advert.url }}">Live Chat:</a>
+        {{ live_chat_advert.title }}
+      </strong>
+    </div>
+    {% if live_chat_advert.description %}
+    <div class="live_chat_description">
+      {{ live_chat_advert.description }}
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endif %}

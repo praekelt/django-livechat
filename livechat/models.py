@@ -4,41 +4,33 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from django.contrib import comments
 
+from jmbo.models import ModelBase
+
 
 Comment = comments.get_model()
 
 
-class SiteManager(models.Manager):
-
-    def get_query_set(self, *args, **kwargs):
-        qs = super(SiteManager, self).get_query_set(*args, **kwargs)
-        return qs.filter(sites=Site.objects.get_current(), published=True)
-
-
-class LiveChat(models.Model):
+class LiveChat(ModelBase):
     # Use a generic foreign key mechanism to be able to link livechats to any
     # content type.
-    content_type = models.ForeignKey(ContentType)
-    object_id = models.PositiveIntegerField()
+    # content_type = already exists in ModelBase
+    object_id = models.PositiveIntegerField(
+            null=True, blank=True,
+            editable=False)
     content_object = generic.GenericForeignKey('content_type', 'object_id')
 
-    published = models.BooleanField(default=True)
-    active = models.BooleanField(default=True)
-    title = models.CharField(max_length=255)
-    description = models.TextField()
-    sites = models.ManyToManyField(Site)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
     objects = models.Manager()
-    site = SiteManager()
 
     class Meta:
-        ordering = ['-published', '-created_at']
+        ordering = ['-publish_on', '-created']
+        verbose_name = 'Live Chat'
+        verbose_name_plural = 'Live Chats'
 
     def comment_set(self):
         ct = ContentType.objects.get_for_model(self.__class__)
-        return Comment.objects.filter(content_type=ct, object_pk=self.pk).order_by('-submit_date')
+        return Comment.objects.filter(
+            content_type=ct, 
+            object_pk=self.pk).order_by('-submit_date')
 
     def __unicode__(self):
         return 'Live Chat %s' % (self.title,)

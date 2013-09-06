@@ -3,53 +3,41 @@ from django.contrib import admin
 from django.core.paginator import Paginator
 from django import forms
 
+from jmbo.admin import ModelBaseAdmin
+
 from livechat.models import LiveChat, LiveChatResponse
 
 
-class LiveChatAdminForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        super(LiveChatAdminForm, self).__init__(*args, **kwargs)
-
-    class Meta:
-        model = LiveChat
-
-
-class LiveChatAdmin(admin.ModelAdmin):
-    form = LiveChatAdminForm
-
-    list_filter = ['published', 'active', 'sites', 'created_at']
-    list_display = ['title', 'active']
-    fields = (
-        'published',
-        'active',
-        'title',
-        'description',
-        'sites',
-    )
+class LiveChatAdmin(ModelBaseAdmin):
+    # list_display = ['title', 'slug', 'created', 'state']
+    # fields = (
+    #     'title',
+    #     'subtitle',
+    #     'description',
+    #     'publish_on',
+    #     'retract_on',
+    #     'primary_category',
+    #     'categories',
+    #     'comments_closed',
+    #     'likes_closed',
+    #     'sites'
+    # )
+    # fieldsets = {}
     
-    def has_add_permission(self, request):
-        """ We will be adding livechats where it is needed by declaring an
-        inline admin model for it for the relevant content type. For an example,
-        see the AskMAMA project's mama/admin.py module.
-        """
-        return False
-
     def get_urls(self):
         urls = super(LiveChatAdmin, self).get_urls()
         from django.conf.urls.defaults import patterns
         my_urls = patterns('',
-            (r'^(?P<pk>\d+)/participate/$', 
-                self.admin_site.admin_view(self.participate), 
-                {}, 
-                "livechat"),
-            (r'^(?P<pk>\d+)/participate_responses/$', 
+            (r'^participate_livechat/(?P<pk>\d+)/$', 
+                self.admin_site.admin_view(self.participate_livechat), 
+                {}, "participate_livechat"),
+            (r'^participate_responses/(?P<pk>\d+)/$', 
                 self.admin_site.admin_view(self.participate_responses), 
-                {}, 
-                "participate_responses"),
+                {}, "participate_responses"),
         )
         return my_urls + urls
 
-    def participate(self, request, pk):
+    def participate_livechat(self, request, pk):
         livechat = LiveChat.objects.get(pk=pk)
         comments_qs = livechat.comment_set()
 
