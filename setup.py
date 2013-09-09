@@ -15,7 +15,8 @@ setup(
     ],
     install_requires = [
         'django==1.4.5',
-        'south==0.8.1'
+        'south==0.8.1',
+        'jmbo==0.5.5'
     ],
     tests_require=[
         'django-setuptest==0.1.4',
