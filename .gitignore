@@ -4,3 +4,5 @@
 *.log
 *.pot
 local_settings.py
+*.egg
+pep8.txt
