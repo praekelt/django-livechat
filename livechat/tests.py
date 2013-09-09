@@ -35,7 +35,7 @@ class LiveChatTestCase(unittest.TestCase):
         self.stuff.save()
 
     def test_livechat(self):
-        chat = LiveChat.objects.create(content_object=self.stuff, 
+        chat = LiveChat.objects.create(content_object=self.stuff,
                                        title="Test Live Chat",
                                        slug='test-live-chat')
         chat.save()

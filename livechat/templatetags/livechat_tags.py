@@ -27,24 +27,25 @@ def live_chat_banner(context):
 
     chat = None
     now = datetime.now()
-    lcqs = LiveChat.permitted.filter(primary_category__slug='ask-mama',
-                                 categories__slug='live-chat',
-                                 publish_on__lte=now).order_by('-publish_on')
+    lcqs = LiveChat.permitted.filter(
+        primary_category__slug='ask-mama',
+        categories__slug='live-chat',
+        publish_on__lte=now).order_by('-publish_on')
     for itm in lcqs:
         pub_date = itm.publish_on
         delta = now - pub_date
         if delta.days < 5:
-            chat = itm 
+            chat = itm
             break
 
     if chat is not None:
         context['live_chat_advert'] = {
-                'url': reverse('livechat:show_livechat', kwargs={
-                    'slug': chat.slug
-                }),
-                'title': chat.title,
-                'description': chat.description
-                }
+            'url': reverse('livechat:show_livechat', kwargs={
+                'slug': chat.slug
+            }),
+            'title': chat.title,
+            'description': chat.description
+        }
     return context
 
 
@@ -52,7 +53,7 @@ def live_chat_banner(context):
 def get_livechat_for_article(context, post, var_name):
     post_type = ContentType.objects.get_for_model(post.__class__)
     chats = LiveChat.permitted.filter(content_type=post_type,
-                                    object_id=post.id)
+                                      object_id=post.id)
     try:
         context[var_name] = chats.latest('created')
     except LiveChat.DoesNotExist:
@@ -63,16 +64,16 @@ def get_livechat_for_article(context, post, var_name):
 # def get_livechat_page(context, livechat, var_name):
 #     """
 #     Fetches a page object for the given livechat
-# 
+#
 #     Usage:
 #     {% get_livechat_page `livechat` `var_name` %}
 #     """
 #     request = context['request']
-# 
+#
 #     comments_qs = livechat.comment_set().exclude(is_removed=True)
 #     comments_qs = comments_qs.distinct().select_related('user')
 #     comments_qs = comments_qs.order_by('-submit_date')
-# 
+#
 #     answered = request.GET.get('answered', '')
 #     popular = request.GET.get('popular', '')
 #     if answered == 'true':
@@ -81,11 +82,12 @@ def get_livechat_for_article(context, post, var_name):
 #         comments_qs = comments_qs.filter(livechatresponse__isnull=True)
 #     if popular == 'true':
 #         comments_qs = comments_qs.order_by('-like_count')
-# 
+#
 #     paginator = Paginator(comments_qs, per_page=10)
 #     page = paginator.page(request.GET.get('p', 1))
 #     context['page'] = page
 #     return ''
+
 
 @register.simple_tag(takes_context=True)
 def get_mylivechat(context, livechat, var_name='my_comments'):
@@ -100,8 +102,8 @@ def get_mylivechat(context, livechat, var_name='my_comments'):
     if not request.user.is_authenticated():
         return None
 
-    comments_qs = livechat.comment_set().distinct() \
-                    .filter(user=request.user)\
-                    .select_related('user').order_by('-submit_date')
+    comments_qs = livechat.comment_set().distinct()
+    comments_qs = comments_qs.filter(user=request.user)
+    comments_qs = comments_qs.select_related('user').order_by('-submit_date')
     context[var_name] = comments_qs
     return ''

@@ -25,16 +25,17 @@ class LiveChatAdmin(ModelBaseAdmin):
     # fieldsets = {}
 
     change_form_template = 'admin/livechat/livechat/change_form.html'
-    
+
     def get_urls(self):
         urls = super(LiveChatAdmin, self).get_urls()
         from django.conf.urls.defaults import patterns
-        my_urls = patterns('',
-            (r'^participate_livechat/(?P<pk>\d+)/$', 
-                self.admin_site.admin_view(self.participate_livechat), 
+        my_urls = patterns(
+            '',
+            (r'^participate_livechat/(?P<pk>\d+)/$',
+                self.admin_site.admin_view(self.participate_livechat),
                 {}, "participate_livechat"),
-            (r'^participate_responses/(?P<pk>\d+)/$', 
-                self.admin_site.admin_view(self.participate_responses), 
+            (r'^participate_responses/(?P<pk>\d+)/$',
+                self.admin_site.admin_view(self.participate_responses),
                 {}, "participate_responses"),
         )
         return my_urls + urls
@@ -73,8 +74,8 @@ class LiveChatAdmin(ModelBaseAdmin):
         except ObjectDoesNotExist, e:
             comment = None
 
-        return render(request, 
-                      "admin/livechat/livechat/participate_responses.html", 
+        return render(request,
+                      "admin/livechat/livechat/participate_responses.html",
                       {
                           'comment': comment
                       })
