@@ -23,6 +23,8 @@ class LiveChatAdmin(ModelBaseAdmin):
     #     'sites'
     # )
     # fieldsets = {}
+
+    change_form_template = 'admin/livechat/livechat/change_form.html'
     
     def get_urls(self):
         urls = super(LiveChatAdmin, self).get_urls()

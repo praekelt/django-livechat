@@ -4,7 +4,7 @@
 {% if change %}{% if not is_popup %}
   <ul class="object-tools">
     <li><a href="history/" class="historylink">{% trans "History" %}</a></li>
-    <li><a href="{% url participate_livechat pk=object_id %}" class="historylink">Participate in Live Chat ...</a></li>
+    <li><a href="{% url admin:participate_livechat pk=object_id %}" class="historylink">Participate in Live Chat ...</a></li>
     {% if has_absolute_url %}
         <li><a href="../../../r/{{ content_type_id }}/{{ object_id }}/" class="viewsitelink">
             {% trans "View on site" %}</a>
@@ -12,4 +12,8 @@
     {% endif%}
   </ul>
 {% endif %}{% endif %}
+{% endblock %}
+
+{% block nav-global %}
+kkkkkkkkkkkkkkkkkkkkkkkkkkk
 {% endblock %}
