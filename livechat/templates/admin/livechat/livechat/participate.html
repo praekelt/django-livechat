@@ -1,11 +1,18 @@
 {% extends "admin/base_site.html" %}
-{% load i18n admin_list %}
+{% load i18n admin_list admin_static %}
+{% load url from future %}
+{% load admin_urls %}
 
 {% block extrastyle %}
-    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}admin/css/forms.css" />
-    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}admin/css/changelists.css" />
-    <script type="text/javascript" src="{{ STATIC_URL }}admin/js/admin/RelatedObjectLookups.js"></script>
-    <script type="text/javascript" src="{{ STATIC_URL }}admin/js/jquery.js"></script>
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" 
+        href="{% static "admin/css/forms.css" %}" />
+    <link rel="stylesheet" type="text/css" 
+        href="{% static "admin/css/changelists.css" %}" />
+    <script type="text/javascript" 
+        src="{% static "admin/js/admin/RelatedObjectLookups.js" %}"></script>
+    <script type="text/javascript" 
+        src="{% static "admin/js/jquery.js" %}"></script>
 
     <script type="text/javascript" charset="utf-8">
         /*
@@ -27,7 +34,7 @@
             newRepr = html_unescape(newRepr);
             var name = windowname_to_id(win.name);
             var id = name.split("_")[1];
-            $('#' + name + '_responses').load('{% url admin:participate_responses pk=livechat.pk %}?comment_id='+id);
+            $('#' + name + '_responses').load('{% url 'admin:participate_responses' pk=livechat.pk %}?comment_id='+id);
             win.close();
         }
     </script>
@@ -52,7 +59,7 @@
             </p>
             <label><strong>Description:</strong></label>
             <p>
-                {{livechat.description|safe}}
+                {{livechat.description|safe|linebreaks}}
             </p>
         </div>
         <div>
@@ -71,17 +78,9 @@
 			<div>
                 <label><strong>Author:</strong></label>
                 <p>
-                    <a href="{% url admin:livechat_livechatresponse_add %}?comment={{comment.pk}}&amp;livechat={{livechat.pk}}" class="add-another" id="add_livechatresponse_{{comment.pk}}_id" onclick="return showAddAnotherPopup(this);">
+                    <a href="{% url 'admin:livechat_livechatresponse_add' %}?comment={{comment.pk}}&amp;livechat={{livechat.pk}}" class="add-another" id="add_livechatresponse_{{comment.pk}}_id" onclick="return showAddAnotherPopup(this);">
                         Respond to:
-                        {% if comment.user.get_profile.comment_as_anon %}
-                            Anon.
-                        {% else %}
-                            {% if comment.user.get_profile.fullname %}
-                                {{ comment.user.get_profile.fullname }}</a>
-                            {% else %}
-                                Anon.
-                            {% endif %}
-                        {% endif %}
+                        {{ comment.user.username }}
                     </a>
                 </p>
                 <label><strong>Comment:</strong></label>
@@ -110,7 +109,7 @@
 <div id="changelist">
     <p class="paginator">
         {% if comments.has_previous %}
-            <a href="{% url admin:livechat pk=livechat.pk %}?page={{comments.previous_page_number}}">previous page</a>
+            <a href="{% url 'admin:livechat' pk=livechat.pk %}?page={{comments.previous_page_number}}">previous page</a>
         {% endif %}
 
         <span>
@@ -118,7 +117,7 @@
         </span>
 
         {% if comments.has_next %}
-            <a href="{% url admin:livechat pk=livechat.pk %}?page={{comments.next_page_number}}">next page</a>
+            <a href="{% url 'admin:livechat' pk=livechat.pk %}?page={{comments.next_page_number}}">next page</a>
         {% endif %}
         <br/>
         Total questions: {{comments.object_list.count}}
