@@ -39,9 +39,7 @@ class LiveChat(ModelBase):
 class LiveChatResponse(models.Model):
     livechat = models.ForeignKey(LiveChat)
     author = models.ForeignKey('auth.User')
-    comment = models.ForeignKey(
-        Comment,
-        limit_choices_to={'object_pk': livechat})
+    comment = models.ForeignKey(Comment)
     response = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
