@@ -1,24 +1,67 @@
 {% extends "base.html" %}
 
 {% load jmbo_inclusion_tags jmbo_template_tags %}
-{% load comments likes_inclusion_tags %}
-{% load livechat_tags %}
+{% load comments likes_inclusion_tags moderator_inclusion_tags %}
+{% load livechat_tags mama_inclusion_tags %}
 
 {% block content %}
-<div class="maroon">
+<div class="{{ livechat.primary_category.color}} ">
   <div class="h1">
-    {{livechat.title}}
+    {{ livechat.title }}
+    {% comment %}
     <div class="stamp">
         {% humanize_time_diff livechat.created "Ago" %} // <a href="#comments">{{ livechat.comment_count }} Comments</a> // {% likes livechat %}
     </div>
+    {% endcomment %}
   </div>
 
   <div class="content-inner">
     <div class="post">
-      {{ livechat.description|safe }}
+      {{ livechat.description|safe|linebreaks }}
     </div>
 
-    {% object_comments livechat %}
+    <div class="h1">Questions and Responses</div>
+    <div class="items">
+    {% if livechat.comment_set.exists %}
+        {% for comment in livechat.comment_set.all %}
+            <div class="item comment no-pic">
+                <div class="meta">
+                    <div class="title">{{ comment.name }}</div>
+                    <div class="stamp">{{ comment.submit_date }} | {% likes comment %} {% report_comment_abuse comment %}</a></div>
+                    <div class="stamp">{{ comment.comment|linebreaks }}</div>
+                </div>
+
+                {% if comment.livechatresponse_set.exists %}
+                <div class="item comment" style="padding-left: 15px">
+                    {% for response in comment.livechatresponse_set.all %}
+                        <div class="meta">
+                            <div class="title">
+                                Response by:
+                                {{response.author.username}}
+                            </div>
+                            <div class="stamp">{{ response.updated_at }}</div>
+                            <div class="stamp">{{response.response}}</div>
+                        </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+            </div>
+        {% endfor %}
+    {% endif %}
+    </div>
+
+    {% if can_render_comment_form %}
+        {% render_comment_form for livechat %}
+    {% else %}
+        {% if can_comment_code == 'auth_required' %}
+        <div style="padding: 10px">
+            <a href="{% url login %}?next={{ request.META.PATH_INFO }}">
+                Sign in to comment or ask a question
+            </a>
+        </div>
+        {% endif %}
+    {% endif %}
 
   </div>
 </div>

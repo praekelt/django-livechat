@@ -1,18 +1,23 @@
-from django.shortcuts import render, get_object_or_404
 from django.contrib.sites.models import Site
-from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
+
+from django.views.generic.detail import DetailView
+
 
 from livechat.models import LiveChat
 
 current_site = Site.objects.get_current()
 
 
-def show_livechat(request, slug):
-    livechat = get_object_or_404(LiveChat, slug=slug, sites=current_site)
-    return render(request, 'livechat/show.html', {
-        'livechat': livechat,
-        'current_url': reverse('livechat:show_livechat', kwargs={
-            'slug': livechat.slug,
-        })
-    })
+class LiveChatDetailView(DetailView):
+
+    template_name = 'livechat/show.html'
+    model = LiveChat
+
+    def get_context_data(self, **kwargs):
+        context = super(LiveChatDetailView, self).get_context_data(**kwargs)
+        livechat = self.get_object()
+        can_comment, reason_code = livechat.can_comment(self.request)
+        context['can_render_comment_form'] = can_comment
+        context['can_comment_code'] = reason_code
+        return context

@@ -34,7 +34,7 @@ def live_chat_banner(context):
     for itm in lcqs:
         pub_date = itm.publish_on
         delta = now - pub_date
-        if delta.days < 5:
+        if delta.days < 14:
             chat = itm
             break
 
