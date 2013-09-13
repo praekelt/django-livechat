@@ -16,8 +16,4 @@ class LiveChatDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(LiveChatDetailView, self).get_context_data(**kwargs)
-        livechat = self.get_object()
-        can_comment, reason_code = livechat.can_comment(self.request)
-        context['can_render_comment_form'] = can_comment
-        context['can_comment_code'] = reason_code
         return context
