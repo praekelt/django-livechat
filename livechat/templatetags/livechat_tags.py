@@ -1,5 +1,4 @@
 from copy import copy
-from datetime import datetime
 
 from django import template
 from django.core.paginator import Paginator
@@ -21,31 +20,31 @@ def live_chat_banner(context):
     """
     context = copy(context)
 
-    # Find any current live chat. These are LiveChat's with primary
-    # category of 'ask-mama' and category of 'live-chat'. Publication date must
-    # be prior to now, and the chat must be less than 5 days old.
+    # Find any upcoming or current live chat. These are LiveChat's with primary
+    # category of 'ask-mama' and category of 'live-chat'. The Chat date must be
+    # less than 5 days away, or happening now.
 
-    chat = None
-    now = datetime.now()
-    lcqs = LiveChat.permitted.filter(
-        primary_category__slug='ask-mama',
-        categories__slug='live-chat',
-        publish_on__lte=now).order_by('-publish_on')
-    for itm in lcqs:
-        pub_date = itm.publish_on
-        delta = now - pub_date
-        if delta.days < 14:
-            chat = itm
-            break
-
+    chat = LiveChat.chat_finder.upcoming_live_chat()
     if chat is not None:
         context['live_chat_advert'] = {
-            'url': reverse('livechat:show_livechat', kwargs={
-                'slug': chat.slug
-            }),
             'title': chat.title,
             'description': chat.description
         }
+        if chat.is_in_progress():
+            context['live_chat_advert']['url'] = reverse(
+                'livechat:show_livechat', 
+                kwargs={
+                    'slug': chat.slug
+                })
+        else:
+            context['live_chat_advert']['url'] = reverse('askmama_object_list')
+    return context
+
+
+@register.inclusion_tag('livechat/inclusion_tags/live_chat.html',
+                        takes_context=True)
+def show_live_chat(context):
+    context = copy(context)
     return context
 
 
@@ -59,6 +58,7 @@ def get_livechat_for_article(context, post, var_name):
     except LiveChat.DoesNotExist:
         pass
     return ''
+
 
 # @register.simple_tag(takes_context=True)
 # def get_livechat_page(context, livechat, var_name):
