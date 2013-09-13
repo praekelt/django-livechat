@@ -65,12 +65,12 @@
         <div>
             <ul>
                 <li><a href="?">Show all questions</a></li>
-                <li><a href="?popular=true&amp;answered=false">Show most popular unanswered questions</a></li>
                 <li><a href="?answered=false">Show all unanswered questions</a></li>
             </ul>
         </div>
     </field>
 </div>
+
 {% for comment in comments.object_list %}
 <div>
 	<fieldset class="module aligned ">
@@ -106,6 +106,7 @@
     </fieldset>
 </div>
 {% endfor %}
+
 <div id="changelist">
     <p class="paginator">
         {% if comments.has_previous %}
