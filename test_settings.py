@@ -20,5 +20,7 @@ INSTALLED_APPS = (
     'publisher',
 )
 
+SITE_ID = 1
+
 STATIC_URL = ''
 
