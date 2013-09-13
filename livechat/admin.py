@@ -3,28 +3,45 @@ from django.contrib import admin
 from django.core.paginator import Paginator
 from django import forms
 
-from jmbo.admin import ModelBaseAdmin
+from jmbo.admin import ModelBaseAdmin, ModelBaseAdminForm
 
 from livechat.models import LiveChat, LiveChatResponse
 
 
-class LiveChatAdmin(ModelBaseAdmin):
-    # list_display = ['title', 'slug', 'created', 'state']
-    # fields = (
-    #     'title',
-    #     'subtitle',
-    #     'description',
-    #     'publish_on',
-    #     'retract_on',
-    #     'primary_category',
-    #     'categories',
-    #     'comments_closed',
-    #     'likes_closed',
-    #     'sites'
-    # )
-    # fieldsets = {}
+class LiveChatAdminForm(ModelBaseAdminForm):
+    class Meta:
+        model = LiveChat
 
+class LiveChatAdmin(ModelBaseAdmin):
+    form = LiveChatAdminForm
     change_form_template = 'admin/livechat/livechat/change_form.html'
+    fieldsets = (
+        (None, {'fields': ('title', 'subtitle', 'description', \
+                'chat_starts_at', 'chat_ends_at')
+        }),
+        ('Publishing', {'fields': ('sites', 'publish_on', \
+                'retract_on', 'publishers'),
+                    'classes': ('collapse',),
+        }),
+        ('Meta', {'fields': ('categories', 'primary_category', 'tags', \
+            'created', 'owner'),
+                    'classes': ('collapse',),
+        }),
+        ('Image', {'fields': ('image', 'crop_from', 'effect'),
+                    'classes': (),
+        }),
+        ('Commenting', {'fields': ('comments_enabled', 'anonymous_comments', \
+                'comments_closed'),
+                    'classes': ('collapse',),
+        }),
+        ('Liking', {'fields': ('likes_enabled', 'anonymous_likes', \
+                'likes_closed'),
+                    'classes': ('collapse',),
+        }),
+    )
+    list_display = ('title', 'subtitle', 'chat_starts_at', 'chat_ends_at', \
+        '_get_absolute_url', 'owner', 'created', '_actions'
+    )
 
     def get_urls(self):
         urls = super(LiveChatAdmin, self).get_urls()
@@ -85,7 +102,6 @@ class LiveChatResponseAdmin(admin.ModelAdmin):
     raw_id_fields = ['comment', 'livechat']
     exclude = ['author']
     list_display = ['comment', 'response']
-
     fieldsets = (
         (None, {
             'fields': ('comment', 'response', 'livechat',),
