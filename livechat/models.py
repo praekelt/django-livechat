@@ -21,10 +21,10 @@ class LiveChatManager(PermittedManager):
     def upcoming_live_chat(self):
         """
         Find any upcoming or current live chat to advertise on the home page or
-        live chat page. 
-        These are LiveChat's with primary category of 'ask-mama' and category of
-        'live-chat'. The Chat date must be less than 5 days away, or happening
-        now.
+        live chat page.
+        These are LiveChat's with primary category of 'ask-mama' and category
+        of 'live-chat'. The Chat date must be less than 5 days away, or
+        happening now.
         """
         chat = None
         now = datetime.now()
@@ -42,8 +42,8 @@ class LiveChatManager(PermittedManager):
         return chat
 
     def get_current_live_chat(self):
-        """ Check if there is a live chat on the go, so that we should take over
-            the AskMAMA page with the live chat.
+        """ Check if there is a live chat on the go, so that we should take
+            over the AskMAMA page with the live chat.
         """
         now = datetime.now()
         chat = self.upcoming_live_chat()
@@ -57,8 +57,9 @@ class LiveChat(ModelBase):
     Participants use Django comments to post questions and comments. An expert
     or moderator can use functionality in the admin site to add responses.
 
-    The live chat can be uses as a stand-alone object instance, or use a generic
-    foreign key mechanism to attach to another content type in the Django site.
+    The live chat can be uses as a stand-alone object instance, or use a
+    generic foreign key mechanism to attach to another content type in the
+    Django site.
 
     Template tags are provided to display the chat in place in the site.
     """

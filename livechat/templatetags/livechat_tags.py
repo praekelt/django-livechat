@@ -32,7 +32,7 @@ def live_chat_banner(context):
         }
         if chat.is_in_progress():
             context['live_chat_advert']['url'] = reverse(
-                'livechat:show_livechat', 
+                'livechat:show_livechat',
                 kwargs={
                     'slug': chat.slug
                 })

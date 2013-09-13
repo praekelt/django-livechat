@@ -12,34 +12,41 @@ class LiveChatAdminForm(ModelBaseAdminForm):
     class Meta:
         model = LiveChat
 
+
 class LiveChatAdmin(ModelBaseAdmin):
     form = LiveChatAdminForm
     change_form_template = 'admin/livechat/livechat/change_form.html'
     fieldsets = (
-        (None, {'fields': ('title', 'subtitle', 'description', \
-                'chat_starts_at', 'chat_ends_at')
+        (None, {
+            'fields': ('title', 'subtitle', 'description',
+                       'chat_starts_at', 'chat_ends_at')
         }),
-        ('Publishing', {'fields': ('sites', 'publish_on', \
-                'retract_on', 'publishers'),
-                    'classes': ('collapse',),
+        ('Publishing', {
+            'fields': ('sites', 'publish_on', 'retract_on', 'publishers'),
+            'classes': ('collapse',),
         }),
-        ('Meta', {'fields': ('categories', 'primary_category', 'tags', \
-            'created', 'owner'),
-                    'classes': ('collapse',),
+        ('Meta', {
+            'fields': ('categories', 'primary_category', 'tags',
+                       'created', 'owner'),
+            'classes': ('collapse',),
         }),
-        ('Image', {'fields': ('image', 'crop_from', 'effect'),
-                    'classes': (),
+        ('Image', {
+            'fields': ('image', 'crop_from', 'effect'),
+            'classes': (,),
         }),
-        ('Commenting', {'fields': ('comments_enabled', 'anonymous_comments', \
-                'comments_closed'),
-                    'classes': ('collapse',),
+        ('Commenting', {
+            'fields': ('comments_enabled', 'anonymous_comments',
+                       'comments_closed'),
+            'classes': ('collapse',),
         }),
-        ('Liking', {'fields': ('likes_enabled', 'anonymous_likes', \
-                'likes_closed'),
-                    'classes': ('collapse',),
+        ('Liking', {
+            'fields': ('likes_enabled', 'anonymous_likes',
+                       'likes_closed'),
+            'classes': ('collapse',),
         }),
     )
-    list_display = ('title', 'subtitle', 'chat_starts_at', 'chat_ends_at', \
+    list_display = (
+        'title', 'subtitle', 'chat_starts_at', 'chat_ends_at',
         '_get_absolute_url', 'owner', 'created', '_actions'
     )
 
