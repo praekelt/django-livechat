@@ -1,19 +1,5 @@
-from django.contrib.sites.models import Site
-from django.core.urlresolvers import reverse
-
-from django.views.generic.detail import DetailView
+from django.views.generic.base import TemplateView
 
 
-from livechat.models import LiveChat
-
-current_site = Site.objects.get_current()
-
-
-class LiveChatDetailView(DetailView):
-
+class LiveChatDetailView(TemplateView):
     template_name = 'livechat/show.html'
-    model = LiveChat
-
-    def get_context_data(self, **kwargs):
-        context = super(LiveChatDetailView, self).get_context_data(**kwargs)
-        return context
