@@ -31,8 +31,7 @@ class LiveChatAdmin(ModelBaseAdmin):
             'classes': ('collapse',),
         }),
         ('Image', {
-            'fields': ('image', 'crop_from', 'effect'),
-            'classes': (,),
+            'fields': ('image', 'crop_from', 'effect')
         }),
         ('Commenting', {
             'fields': ('comments_enabled', 'anonymous_comments',
