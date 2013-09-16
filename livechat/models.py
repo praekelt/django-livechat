@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 
+from django.conf import settings
 from django.db import models
 from django.contrib.sites.models import Site
 from django.contrib.contenttypes.models import ContentType
@@ -32,10 +33,20 @@ class LiveChatManager(PermittedManager):
 
         lcqs = self.get_query_set()
         lcqs = lcqs.filter(
-            primary_category__slug='ask-mama',
-            categories__slug='live-chat',
             chat_starts_at__gte=advert_window_start,
             chat_ends_at__gte=now).order_by('-chat_starts_at')
+        try:
+            if settings.LIVECHAT_PRIMARY_CATEGORY:
+                lcqs = lcqs.filter(
+                    primary_category__slug=settings.LIVECHAT_PRIMARY_CATEGORY)
+        except AttributeError:
+            pass
+        try:
+            if settings.LIVECHAT_CATEGORIES:
+                lcqs = lcqs.filter(
+                    categories__slug__in=settings.LIVECHAT_CATEGORIES)
+        except AttributeError:
+            pass
         if lcqs.exists():
             chat = lcqs.latest('chat_starts_at')
 

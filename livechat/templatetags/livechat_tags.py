@@ -20,9 +20,8 @@ def live_chat_banner(context):
     """
     context = copy(context)
 
-    # Find any upcoming or current live chat. These are LiveChat's with primary
-    # category of 'ask-mama' and category of 'live-chat'. The Chat date must be
-    # less than 5 days away, or happening now.
+    # Find any upcoming or current live chat. The Chat date must be less than 5
+    # days away, or currently in progress.
 
     chat = LiveChat.chat_finder.upcoming_live_chat()
     if chat is not None:
@@ -45,6 +44,16 @@ def live_chat_banner(context):
                         takes_context=True)
 def show_live_chat(context):
     context = copy(context)
+    request = context['request']
+
+    try:
+        paginator = Paginator(
+            context['live_chat']['current_live_chat'].comment_set(), 
+            per_page=10)
+        context['chat_comments'] = paginator.page(request.GET.get('p', 1))
+    except AttributeError:
+        pass
+
     return context
 
 
