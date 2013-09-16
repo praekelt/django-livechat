@@ -2,8 +2,19 @@
 
 {% load livechat_tags %}
 
+
+{% block above_content %}
+{{ block.super }}
+<div class="text_banner">
+  <div class="banner_content">
+    <p><strong>
+      <a href="{% url askmama_object_list %}">Ask MAMA a Question ></a>
+    </strong></p>
+  </div>
+</div>
+{% endblock %}
+
+
 {% block content %}
-
 {% show_live_chat %}
-
 {% endblock %}
