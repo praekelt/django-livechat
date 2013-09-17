@@ -48,7 +48,7 @@ def show_live_chat(context):
 
     try:
         paginator = Paginator(
-            context['live_chat']['current_live_chat'].comment_set(), 
+            context['live_chat']['current_live_chat'].comment_set(),
             per_page=10)
         context['chat_comments'] = paginator.page(request.GET.get('p', 1))
     except AttributeError:
