@@ -36,7 +36,7 @@ def live_chat_banner(context):
                     'slug': chat.slug
                 })
         else:
-            context['live_chat_advert']['url'] = reverse('askmama_object_list')
+            context['live_chat_advert']['url'] = reverse('askmama_detail')
     return context
 
 
