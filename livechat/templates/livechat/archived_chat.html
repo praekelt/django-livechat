@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% load jmbo_inclusion_tags jmbo_template_tags %}
+{% load comments likes_inclusion_tags moderator_inclusion_tags %}
+{% load livechat_tags mama_inclusion_tags %}
+
+{% block content %}
+<div class="{{ object.primary_category.color}} ">
+  <div class="h1">{{ object.title }}</div>
+
+  <div class="content-inner">
+    <div class="items">
+      <div class="item comment no-pic">
+        <div class="meta">
+          <div class="title">
+            For those who missed the live chat, that was held on
+            {{ object.chat_ends_at|date:"d M Y" }}
+            we present this archive of the chat. Please note that voting and
+            comments are no longer available.
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="post">
+      {{ object.description|safe|linebreaks }}
+    </div>
+
+    <div class="h1">Questions and Responses</div>
+    <div class="items">
+      {% if chat_comments %}
+        {% for comment in chat_comments.object_list %}
+            <div class="item comment no-pic">
+                <div class="meta">
+                    <div class="title">{{ comment.name }}</div>
+                    <div class="stamp">{{ comment.submit_date }}</a></div>
+                    <div class="stamp">{{ comment.comment|linebreaks }}</div>
+                </div>
+
+                {% if comment.livechatresponse_set.exists %}
+                <div class="item comment" style="padding-left: 15px">
+                    {% for response in comment.livechatresponse_set.all %}
+                        <div class="meta">
+                            <div class="title">
+                                Response by:
+                                {{ response.author.username }}
+                            </div>
+                            <div class="stamp">{{ response.updated_at }}</div>
+                            <div class="stamp">{{ response.response }}</div>
+                        </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+            </div>
+        {% endfor %}
+
+        <div class="pagination">
+          {% if chat_comments.has_previous %}
+              <span><a href="?p={{chat_comments.previous_page_number}}&amp;answered={{answered}}&amp;popular={{popular}}">Previous</a></span> |
+          {% else %}
+              <span>Previous</span> |
+          {% endif %}
+          <span class="current">
+              Page {{ chat_comments.number }} of {{ chat_comments.paginator.num_pages }}
+          </span>
+          {% if chat_comments.has_next %}
+              | <span><a href="?p={{chat_comments.next_page_number}}&amp;answered={{answered}}&amp;popular={{popular}}">Next</a></span>
+          {% else %}
+              | <span>Next</span>
+          {% endif %}
+        </div>
+      {% else %}
+        <div class="post">
+          No questions yet. Go ahead and ask a question.
+        </div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+{% endblock %}

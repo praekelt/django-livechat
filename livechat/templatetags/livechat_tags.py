@@ -51,7 +51,7 @@ def show_live_chat(context):
             context['live_chat']['current_live_chat'].comment_set(),
             per_page=10)
         context['chat_comments'] = paginator.page(request.GET.get('p', 1))
-    except AttributeError:
+    except (KeyError, AttributeError):
         pass
 
     return context
@@ -67,3 +67,21 @@ def get_livechat_for_article(context, post, var_name):
     except LiveChat.DoesNotExist:
         pass
     return ''
+
+
+@register.inclusion_tag('livechat/inclusion_tags/last_live_chat_banner.html',
+                        takes_context=True)
+def show_last_live_chat(context):
+    context = copy(context)
+    chat = LiveChat.chat_finder.get_last_live_chat()
+    if chat:
+        context['last_live_chat'] = {
+            'title': chat.title,
+            'chat_ends_at': chat.chat_ends_at,
+            'url': reverse('livechat:show_archived_livechat',
+                            kwargs={
+                                'slug': chat.slug
+                            })
+
+        }
+    return context
