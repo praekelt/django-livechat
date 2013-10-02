@@ -29,7 +29,7 @@ class LiveChatManager(PermittedManager):
         """
         chat = None
         now = datetime.now()
-        advert_window_start = now - timedelta(days=5)
+        advert_window_start = now - timedelta(days=1)
 
         lcqs = self.get_query_set()
         lcqs = lcqs.filter(
@@ -60,6 +60,21 @@ class LiveChatManager(PermittedManager):
         chat = self.upcoming_live_chat()
         if chat and chat.is_in_progress():
             return chat
+        return None
+
+    def get_last_live_chat(self):
+        """ Check if there is a live chat that ended in the last 3 days, and
+            return it. We will display a link to it on the articles page.
+        """
+        now = datetime.now()
+
+        lcqs = self.get_query_set()
+        lcqs = lcqs.filter(
+            chat_ends_at__lte=now,
+            ).order_by('-chat_ends_at')
+        for itm in lcqs:
+            if itm.chat_ends_at + timedelta(days=3) > now:
+                return itm
         return None
 
 

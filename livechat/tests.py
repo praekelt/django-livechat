@@ -129,3 +129,42 @@ class LiveChatTestCase(unittest.TestCase):
         chat.save()
         current = LiveChat.chat_finder.get_current_live_chat()
         self.assertEquals(current, chat)
+
+    def test_last_live_chat(self):
+        """ Test finding a concluded chat up to 3 days ago, to show an archived
+            view of it.
+        """
+        # 1. Test a chat more than 4 days ago in the past.
+        now = datetime.now()
+        chat = LiveChat.objects.create(title="Test Live Chat",
+                                       slug='test-live-chat',
+                                       chat_starts_at=now-timedelta(days=5),
+                                       chat_ends_at=now-timedelta(days=4))
+        chat.state = 'published'
+        chat.sites = [Site.objects.get_current()]
+        chat.primary_category = self.askmama_cat
+        chat.categories = [self.livechat_cat]
+        chat.save()
+        past_chat = LiveChat.chat_finder.get_last_live_chat()
+        self.assertIsNone(past_chat)
+
+        # 2. Test a chat in the goldilocks range, i.e. ended less than 3 days
+        # ago.
+        chat.chat_ends_at = now - timedelta(days=2)
+        chat.save()
+        last_chat = LiveChat.chat_finder.get_last_live_chat()
+        self.assertEquals(last_chat, chat)
+
+        # 3. Test a chat that is currently in progress
+        chat.chat_starts_at = now - timedelta(hours=1)
+        chat.chat_ends_at = now + timedelta(hours=2)
+        chat.save()
+        current = LiveChat.chat_finder.get_last_live_chat()
+        self.assertIsNone(current)
+
+        # 3. Test a future chat
+        chat.chat_starts_at = now + timedelta(hours=1)
+        chat.chat_ends_at = now + timedelta(hours=2)
+        chat.save()
+        future = LiveChat.chat_finder.get_last_live_chat()
+        self.assertIsNone(future)
