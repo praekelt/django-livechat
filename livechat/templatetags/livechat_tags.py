@@ -79,9 +79,9 @@ def show_last_live_chat(context):
             'title': chat.title,
             'chat_ends_at': chat.chat_ends_at,
             'url': reverse('livechat:show_archived_livechat',
-                            kwargs={
-                                'slug': chat.slug
-                            })
+                           kwargs={
+                               'slug': chat.slug
+                           })
 
         }
     return context

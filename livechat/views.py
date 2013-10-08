@@ -23,7 +23,7 @@ class LiveChatArchiveView(DetailView):
             context['chat_comments'] = paginator.page(request.GET.get('p', 1))
         except (KeyError, AttributeError):
             pass
-        return context 
+        return context
 
     def get_object(self):
         slug = self.kwargs.get(self.slug_url_kwarg, None)
