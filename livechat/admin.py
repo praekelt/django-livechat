@@ -1,7 +1,6 @@
 from django.shortcuts import render
 from django.contrib import admin
 from django.core.paginator import Paginator
-from django import forms
 
 from jmbo.admin import ModelBaseAdmin, ModelBaseAdminForm
 
@@ -16,6 +15,7 @@ class LiveChatAdminForm(ModelBaseAdminForm):
 class LiveChatAdmin(ModelBaseAdmin):
     form = LiveChatAdminForm
     change_form_template = 'admin/livechat/livechat/change_form.html'
+    raw_id_fields = ('owner', )
     fieldsets = (
         (None, {
             'fields': ('title', 'subtitle', 'description',
