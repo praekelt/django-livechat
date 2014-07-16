@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.contrib import admin
 from django.core.paginator import Paginator
+import utils
 
 from jmbo.admin import ModelBaseAdmin, ModelBaseAdminForm
 
@@ -16,10 +17,11 @@ class LiveChatAdmin(ModelBaseAdmin):
     form = LiveChatAdminForm
     change_form_template = 'admin/livechat/livechat/change_form.html'
     raw_id_fields = ('owner', )
+    actions = ['cancel_live_chat']
     fieldsets = (
         (None, {
-            'fields': ('title', 'subtitle', 'description',
-                       'chat_starts_at', 'chat_ends_at')
+            'fields': ('title', 'expert', 'subtitle', 'description',
+                       'chat_starts_at', 'chat_ends_at', 'maximum_questions')
         }),
         ('Publishing', {
             'fields': ('sites', 'publish_on', 'retract_on', 'publishers'),
@@ -45,9 +47,19 @@ class LiveChatAdmin(ModelBaseAdmin):
         }),
     )
     list_display = (
-        'title', 'subtitle', 'chat_starts_at', 'chat_ends_at',
+        'title', 'subtitle', 'chat_starts_at',
         '_get_absolute_url', 'owner', 'created', '_actions'
     )
+
+    def cancel_live_chat(self, request, queryset):
+        for chat in queryset:
+            utils.cancel_chat(chat.id)
+
+        self.message_user(
+            request,
+            "%s has successfully been cancelled" % queryset.count()
+        )
+    cancel_live_chat.short_description = "Cancel selected live chats"
 
     def get_urls(self):
         urls = super(LiveChatAdmin, self).get_urls()
@@ -66,6 +78,7 @@ class LiveChatAdmin(ModelBaseAdmin):
     def participate_livechat(self, request, pk):
         livechat = LiveChat.objects.get(pk=pk)
         comments_qs = livechat.comment_set()
+        unanswered_count = comments_qs.filter(livechatresponse__isnull=True).count()
 
         answered = request.GET.get('answered', '')
         popular = request.GET.get('popular', '')
@@ -84,7 +97,8 @@ class LiveChatAdmin(ModelBaseAdmin):
             'livechat': livechat,
             'comments': comments,
             'paginator': paginator,
-            'title': 'Participate in %s' % (livechat.title,)
+            'title': 'Participate in %s' % (livechat.title,),
+            'unanswered_count': unanswered_count
         })
 
     def participate_responses(self, request, pk):

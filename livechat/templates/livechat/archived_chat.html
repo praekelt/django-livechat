@@ -5,51 +5,49 @@
 {% load livechat_tags mama_inclusion_tags %}
 
 {% block content %}
-<div class="{{ object.primary_category.color}} ">
-  <div class="h1">{{ object.title }}</div>
 
-  <div class="content-inner">
-    <div class="items">
-      <div class="item comment no-pic">
-        <div class="meta">
-          <div class="title">
-            For those who missed the live chat, that was held on
-            {{ object.chat_ends_at|date:"d M Y" }}
-            we present this archive of the chat. Please note that voting and
-            comments are no longer available.
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="post">
-      {{ object.description|safe|linebreaks }}
-    </div>
+<div class="text_banner maroon">
+  <div class="h1">LIVE CHAT ARCHIVE</div>
 
-    <div class="h1">Questions and Responses</div>
+<div class="banner_content live_chat">
+    <div>
+      <strong>{{ object.title }}<br/></strong>
+       {{ object.expert }}<br/>
+       {{ object.chat_starts_at.time }} on {{ object.chat_starts_at.date }}<br/>
+    </div>
+</div>
+    <div class="h1"> </div>
     <div class="items">
       {% if chat_comments %}
         {% for comment in chat_comments.object_list %}
+            {% if comment.livechatresponse_set.exists %}
             <div class="item comment no-pic">
-                <div class="meta">
-                    <div class="title">{{ comment.name }}</div>
-                    <div class="stamp">{{ comment.submit_date }}</a></div>
-                    <div class="stamp">{{ comment.comment|linebreaks }}</div>
-                </div>
+              <div class="meta">
 
-                {% if comment.livechatresponse_set.exists %}
-                <div class="item comment" style="padding-left: 15px">
-                    {% for response in comment.livechatresponse_set.all %}
-                        <div class="meta">
-                            <div class="title">
-                                Response by:
-                                {{ response.author.username }}
-                            </div>
-                            <div class="stamp">{{ response.updated_at }}</div>
-                            <div class="stamp">{{ response.response }}</div>
-                        </div>
-                    {% endfor %}
-                </div>
-                {% endif %}
+                {% if comment.user %}
+                  <b><a href="{% url public_profile comment.user.id %}">{{ comment.name }}</a></b>
+                  {% else %}
+                  {{ comment.name }}
+                  {% endif %} asked at {{ comment.submit_date.time }}
+                <div class="stamp">{{ comment.comment|linebreaks }}</div>
+              </div>
+
+              <div class="item comment" style="background-color: rgb(244, 229, 234)">
+                  {% for response in comment.livechatresponse_set.all %}
+                      <div class="meta">
+                              <b><a href="{% url public_profile response.author.id %}">
+                                  {{ response.author.username }}</a></b>
+                       replied to
+                          {% if comment.user %}
+                  <b><a href="{% url public_profile comment.user.id %}">{{ comment.name }}</a></b>
+                  {% else %}
+                  {{ comment.name }}
+                  {% endif %} at {{ response.updated_at.time }}
+                          <div class="stamp">{{ response.response }}</div>
+                      </div>
+                  {% endfor %}
+              </div>
+              {% endif %}
 
             </div>
         {% endfor %}

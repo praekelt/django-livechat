@@ -3,14 +3,10 @@
   <div class="banner_content live_chat">
     <div>
       <strong>
-        <a href="{{ last_live_chat.url }}">Archived Chat:</a>
-        {{ last_live_chat.title }}
+          Did you miss the Live Chat with {{ last_live_chat.expert }} on {{ last_live_chat.title }}?<br/>
+        <a href="{{ last_live_chat.url }}">Catch up on the answers here</a>
+
       </strong>
-    </div>
-    <div class="live_chat_description">
-      If you missed this chat, that ran on 
-      {{ last_live_chat.chat_ends_at|date:"d M Y" }}
-      you can view the archived chat by clicking the link above.
     </div>
   </div>
 </div>
