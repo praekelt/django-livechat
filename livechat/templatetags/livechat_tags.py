@@ -31,6 +31,7 @@ def live_chat_banner(context):
             'expert': chat.expert,
             'commenting_closed': chat.comments_closed,
             'cancelled': chat.is_cancelled,
+            'in_progress': chat.is_in_progress(),
             'url':  reverse(
                 'livechat:show_livechat',
                 kwargs={

@@ -15,7 +15,7 @@
         Join us for Live Chat with {{ live_chat_advert.expert }}
         on {{ live_chat_advert.title }}
 
-        {% if  live_chat_advert.datetime%}
+        {% if not live_chat_advert.in_progress %}
         at {{ live_chat_advert.datetime.time }} on {{ live_chat_advert.datetime.date }}<br/>
           <a href="{{ live_chat_advert.url }}">Find out more</a>
             {% else %}

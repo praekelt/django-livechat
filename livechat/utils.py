@@ -3,7 +3,7 @@ from models import LiveChat
 
 def test_close_chat(chat_id):
     chat = LiveChat.objects.get(pk=chat_id)
-    if chat.comment_count >= chat.maximum_questions-1:
+    if chat.comment_set().count >= int(chat.maximum_questions)-1:
         chat.comments_closed = True
         chat.save()
     return chat

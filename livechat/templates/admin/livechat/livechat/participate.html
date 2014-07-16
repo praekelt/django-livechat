@@ -76,7 +76,7 @@
         </div>
         <div>
             <ul>
-                <li><a href="?">Show all questions </a>({{ livechat.comment_count }}/{{ livechat.maximum_questions }})</li>
+                <li><a href="?">Show all questions </a>({{ livechat.comment_set.count }}/{{ livechat.maximum_questions }})</li>
                 <li><a href="?answered=false">Show all unanswered questions </a>{{ unanswered_count }}</li>
             </ul>
         </div>
