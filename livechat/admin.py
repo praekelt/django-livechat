@@ -1,7 +1,6 @@
 from django.shortcuts import render
 from django.contrib import admin
 from django.core.paginator import Paginator
-import utils
 
 from jmbo.admin import ModelBaseAdmin, ModelBaseAdminForm
 
@@ -53,7 +52,9 @@ class LiveChatAdmin(ModelBaseAdmin):
 
     def cancel_live_chat(self, request, queryset):
         for chat in queryset:
-            utils.cancel_chat(chat.id)
+            chat.is_cancelled = True
+            chat.save()
+
 
         self.message_user(
             request,

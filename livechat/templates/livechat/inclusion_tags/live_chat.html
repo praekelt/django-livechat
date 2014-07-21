@@ -35,6 +35,9 @@
         {% else %}
             {% if can_comment %}
                 {% render_comment_form for live_chat %}
+                <script type="text/javascript"
+        src="{{ STATIC_URL }}livechat_change_question.js">
+</script>
             {% else %}
                 <div class="post">
                 <b>Comments will open when live chat begins</b>

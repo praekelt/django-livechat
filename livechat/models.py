@@ -140,6 +140,12 @@ class LiveChat(ModelBase):
         qs = qs.order_by('-submit_date')
         return qs
 
+    def check_max_comments(self):
+        if self.comment_set().count >= int(self.maximum_questions)-1:
+            self.comments_closed = True
+            self.save()
+
+
     def is_in_progress(self):
         """ Check if the chat is currently in progress
         """
