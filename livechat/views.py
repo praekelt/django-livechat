@@ -15,11 +15,7 @@ class LiveChatArchiveView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(LiveChatArchiveView, self).get_context_data(**kwargs)
-        comments = []
-        for comment in self.object.comment_set():
-            if comment.livechatresponse_set.count() > 0:
-                comments.append(comment)
-
+        comments = self.object.comment_set().filter(livechatresponse__isnull=False)
         request = self.request
         try:
             paginator = Paginator(
