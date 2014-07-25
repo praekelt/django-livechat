@@ -10,13 +10,16 @@ from django.contrib.sites.models import Site
 from jmbo.models import ModelBase
 from category.models import Category
 
-from livechat.models import LiveChat, LiveChatResponse
 
+from livechat.models import LiveChat, LiveChatResponse
+from livechat.admin import LiveChatAdmin
 
 class DummyContentType(ModelBase):
     class Meta:
         proxy = True
 
+class MockRequest(object):
+    pass
 
 class LiveChatTestCase(unittest.TestCase):
 
@@ -168,3 +171,44 @@ class LiveChatTestCase(unittest.TestCase):
         chat.save()
         future = LiveChat.chat_finder.get_last_live_chat()
         self.assertIsNone(future)
+
+    def test_max_questions(self):
+        """Test if max_questions method closes commenting"""
+
+        # 1. Create open chat
+        now = datetime.now()
+        chat = LiveChat.objects.create(title="Test Live Chat",
+                                       slug='test-live-chat',
+                                       chat_starts_at=now-timedelta(days=1),
+                                       chat_ends_at=now-timedelta(days=1),
+                                       )
+
+        # 2. Change max_questions to 0
+        chat.maximum_questions = 0
+        chat.save()
+
+        # 3. Test commenting closed
+        chat.check_max_comments()
+        self.assertTrue(chat.comments_closed)
+
+
+
+    def test_cancel_chat(self):
+
+        now = datetime.now()
+        chat = LiveChat.objects.create(title="Test Live Chat",
+                                       slug='test-live-chat',
+                                       chat_starts_at=now-timedelta(days=1),
+                                       chat_ends_at=now-timedelta(days=1),
+                                       maximum_questions=1,
+                                       )
+
+        queryset = LiveChat.objects.all()
+
+        for chat in queryset:
+            chat.is_cancelled = True
+            chat.save()
+
+        self.assertTrue(chat.is_cancelled)
+
+
