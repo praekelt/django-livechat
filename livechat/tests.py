@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import os
 from datetime import datetime, timedelta
 
 from django.utils import unittest
@@ -40,6 +40,9 @@ class LiveChatTestCase(unittest.TestCase):
                                                     slug='live-chat')
         self.livechat_cat.save()
 
+        cur_dir = os.path.abspath(os.path.dirname(__file__))
+        self.test_image = os.path.join(cur_dir, 'sample_test_image.jpg')
+
     def tearDown(self):
         self.boss_man.delete()
         self.askmama_cat.delete()
@@ -50,6 +53,7 @@ class LiveChatTestCase(unittest.TestCase):
         """
         # create a dummy content type object for the livechat to hang off
         stuff = DummyContentType(title="Dummy Content",
+                                 image=self.test_image,
                                  slug='dummy-content')
         stuff.state = 'published'
         stuff.owner = self.boss_man
@@ -60,6 +64,7 @@ class LiveChatTestCase(unittest.TestCase):
         chat = LiveChat.objects.create(content_object=stuff,
                                        title="Test Live Chat",
                                        slug='test-live-chat',
+                                       image=self.test_image,
                                        chat_starts_at=now-timedelta(hours=1),
                                        chat_ends_at=now+timedelta(hours=1))
         chat.state = 'published'
@@ -80,6 +85,7 @@ class LiveChatTestCase(unittest.TestCase):
         now = datetime.now()
         chat = LiveChat.objects.create(title="Test Live Chat",
                                        slug='test-live-chat',
+                                       image=self.test_image,
                                        chat_starts_at=now-timedelta(hours=2),
                                        chat_ends_at=now-timedelta(hours=1))
         chat.state = 'published'
@@ -110,6 +116,7 @@ class LiveChatTestCase(unittest.TestCase):
         now = datetime.now()
         chat = LiveChat.objects.create(title="Test Live Chat",
                                        slug='test-live-chat',
+                                       image=self.test_image,
                                        chat_starts_at=now-timedelta(hours=2),
                                        chat_ends_at=now-timedelta(hours=1))
         chat.state = 'published'
@@ -141,6 +148,7 @@ class LiveChatTestCase(unittest.TestCase):
         now = datetime.now()
         chat = LiveChat.objects.create(title="Test Live Chat",
                                        slug='test-live-chat',
+                                       image=self.test_image,
                                        chat_starts_at=now-timedelta(days=5),
                                        chat_ends_at=now-timedelta(days=4))
         chat.state = 'published'
