@@ -29,11 +29,10 @@ class LiveChatManager(PermittedManager):
         """
         chat = None
         now = datetime.now()
-        advert_window_start = now - timedelta(days=1)
+
 
         lcqs = self.get_query_set()
         lcqs = lcqs.filter(
-            chat_starts_at__gte=advert_window_start,
             chat_ends_at__gte=now).order_by('-chat_starts_at')
         try:
             if settings.LIVECHAT_PRIMARY_CATEGORY:
@@ -100,7 +99,24 @@ class LiveChat(ModelBase):
     chat_starts_at = models.DateTimeField(
         help_text="Date and time on which the chat will open for questions.")
     chat_ends_at = models.DateTimeField(
+        blank=True,
         help_text="Date and time on which the chat will close.")
+
+    expert = models.CharField(
+        help_text="Name, Surname eg. Dr Faith Evans",
+        null=False, blank=True, max_length=50
+    )
+
+    maximum_questions = models.PositiveIntegerField(
+        null=True, blank=True,
+        help_text="Please remember to add a slight buffer to allow the maximum number of questions to account for /"
+                  "any questions that need to be moderated"
+    )
+
+    is_cancelled = models.BooleanField(
+        default=False,
+        help_text="Indicating whether or not the live chat has been cancelled"
+    )
 
     objects = models.Manager()
     chat_finder = LiveChatManager()
@@ -124,11 +140,17 @@ class LiveChat(ModelBase):
         qs = qs.order_by('-submit_date')
         return qs
 
+    def check_max_comments(self):
+        if self.comment_set().count >= int(self.maximum_questions)-1:
+            self.comments_closed = True
+            self.save()
+
+
     def is_in_progress(self):
         """ Check if the chat is currently in progress
         """
         now = datetime.now()
-        return now > self.chat_starts_at and now <= self.chat_ends_at
+        return now > self.chat_starts_at
 
 
 class LiveChatResponse(models.Model):

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import os
 from datetime import datetime, timedelta
 
 from django.utils import unittest
@@ -10,12 +10,17 @@ from django.contrib.sites.models import Site
 from jmbo.models import ModelBase
 from category.models import Category
 
-from livechat.models import LiveChat, LiveChatResponse
+from livechat.models import LiveChat
 
 
 class DummyContentType(ModelBase):
+
     class Meta:
         proxy = True
+
+
+class MockRequest(object):
+    pass
 
 
 class LiveChatTestCase(unittest.TestCase):
@@ -37,6 +42,9 @@ class LiveChatTestCase(unittest.TestCase):
                                                     slug='live-chat')
         self.livechat_cat.save()
 
+        cur_dir = os.path.abspath(os.path.dirname(__file__))
+        self.test_image = os.path.join(cur_dir, 'sample_test_image.jpg')
+
     def tearDown(self):
         self.boss_man.delete()
         self.askmama_cat.delete()
@@ -47,6 +55,7 @@ class LiveChatTestCase(unittest.TestCase):
         """
         # create a dummy content type object for the livechat to hang off
         stuff = DummyContentType(title="Dummy Content",
+                                 image=self.test_image,
                                  slug='dummy-content')
         stuff.state = 'published'
         stuff.owner = self.boss_man
@@ -57,8 +66,9 @@ class LiveChatTestCase(unittest.TestCase):
         chat = LiveChat.objects.create(content_object=stuff,
                                        title="Test Live Chat",
                                        slug='test-live-chat',
-                                       chat_starts_at=now-timedelta(hours=1),
-                                       chat_ends_at=now+timedelta(hours=1))
+                                       image=self.test_image,
+                                       chat_starts_at=now - timedelta(hours=1),
+                                       chat_ends_at=now + timedelta(hours=1))
         chat.state = 'published'
         chat.sites = [Site.objects.get_current()]
         chat.primary_category = self.askmama_cat
@@ -77,8 +87,9 @@ class LiveChatTestCase(unittest.TestCase):
         now = datetime.now()
         chat = LiveChat.objects.create(title="Test Live Chat",
                                        slug='test-live-chat',
-                                       chat_starts_at=now-timedelta(hours=2),
-                                       chat_ends_at=now-timedelta(hours=1))
+                                       image=self.test_image,
+                                       chat_starts_at=now - timedelta(hours=2),
+                                       chat_ends_at=now - timedelta(hours=1))
         chat.state = 'published'
         chat.sites = [Site.objects.get_current()]
         chat.primary_category = self.askmama_cat
@@ -107,8 +118,9 @@ class LiveChatTestCase(unittest.TestCase):
         now = datetime.now()
         chat = LiveChat.objects.create(title="Test Live Chat",
                                        slug='test-live-chat',
-                                       chat_starts_at=now-timedelta(hours=2),
-                                       chat_ends_at=now-timedelta(hours=1))
+                                       image=self.test_image,
+                                       chat_starts_at=now - timedelta(hours=2),
+                                       chat_ends_at=now - timedelta(hours=1))
         chat.state = 'published'
         chat.sites = [Site.objects.get_current()]
         chat.primary_category = self.askmama_cat
@@ -138,8 +150,9 @@ class LiveChatTestCase(unittest.TestCase):
         now = datetime.now()
         chat = LiveChat.objects.create(title="Test Live Chat",
                                        slug='test-live-chat',
-                                       chat_starts_at=now-timedelta(days=5),
-                                       chat_ends_at=now-timedelta(days=4))
+                                       image=self.test_image,
+                                       chat_starts_at=now - timedelta(days=5),
+                                       chat_ends_at=now - timedelta(days=4))
         chat.state = 'published'
         chat.sites = [Site.objects.get_current()]
         chat.primary_category = self.askmama_cat
@@ -168,3 +181,42 @@ class LiveChatTestCase(unittest.TestCase):
         chat.save()
         future = LiveChat.chat_finder.get_last_live_chat()
         self.assertIsNone(future)
+
+    def test_max_questions(self):
+        """Test if max_questions method closes commenting"""
+
+        # 1. Create open chat
+        now = datetime.now()
+        chat = LiveChat.objects.create(title="Test Live Chat",
+                                       slug='test-live-chat',
+                                       image=self.test_image,
+                                       chat_starts_at=now - timedelta(days=1),
+                                       chat_ends_at=now - timedelta(days=1),
+                                       )
+
+        # 2. Change max_questions to 0
+        chat.maximum_questions = 0
+        chat.save()
+
+        # 3. Test commenting closed
+        chat.check_max_comments()
+        self.assertTrue(chat.comments_closed)
+
+    def test_cancel_chat(self):
+
+        now = datetime.now()
+        chat = LiveChat.objects.create(title="Test Live Chat",
+                                       slug='test-live-chat',
+                                       image=self.test_image,
+                                       chat_starts_at=now - timedelta(days=1),
+                                       chat_ends_at=now - timedelta(days=1),
+                                       maximum_questions=1,
+                                       )
+
+        queryset = LiveChat.objects.all()
+
+        for chat in queryset:
+            chat.is_cancelled = True
+            chat.save()
+
+        self.assertTrue(chat.is_cancelled)

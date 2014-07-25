@@ -2,46 +2,90 @@
 {% load comments likes_inclusion_tags moderator_inclusion_tags %}
 {% load livechat_tags mama_inclusion_tags %}
 
-<div class="{{ live_chat.current_live_chat.primary_category.color}} ">
-  <div class="h1">
-    {{ live_chat.current_live_chat.title }}
-    {% comment %}
-    <div class="stamp">
-        {% humanize_time_diff live_chat.current_live_chat.created "Ago" %} // <a href="#comments">{{ live_chat.current_live_chat.comment_count }} Comments</a> // {% likes live_chat.current_live_chat %}
+
+
+
+<div class="text_banner maroon">
+    <div class="h1">
+    LIVE CHAT
+</div>
+  <div class="banner_content live_chat">
+    <div>
+      <strong>{{ live_chat.title }}<br/></strong>
+       {{ live_chat.expert }}<br/>
+       {{ live_chat.chat_starts_at.time }} on {{ live_chat.chat_starts_at.date }}<br/>
     </div>
-    {% endcomment %}
-  </div>
+</div>
 
   <div class="content-inner">
     <div class="post">
-      {{ live_chat.current_live_chat.description|safe|linebreaks }}
+      {{ live_chat.description|safe|linebreaks }}
     </div>
 
-    <div class="h1">Questions and Responses</div>
+   {% if commenting_closed %}
+        <div class="post">
+        <b>We have reached the maximum number of questions for this live chat.
+            Comments have therefore been closed</b><br/>
+        </div>
+
+        <div class="post">
+        <b>Didn't get your question answered?</b><br/>
+        <a href="{% url askmama_detail %}">Visit askMAMA and ask there</a>
+        </div>
+        {% else %}
+            {% if can_comment %}
+                {% render_comment_form for live_chat %}
+                <script type="text/javascript"
+        src="{{ STATIC_URL }}livechat_change_question.js">
+</script>
+            {% else %}
+                <div class="post">
+                <b>Comments will open when live chat begins</b>
+                </div>
+            {% endif %}
+        {% if live_chat.can_comment_code == 'auth_required' %}
+        <div style="padding: 10px">
+            <a href="{% url login %}?next={{ request.META.PATH_INFO }}">
+                Sign in to comment or ask a question
+            </a>
+        </div>
+        {% endif %}
+    {% endif %}
+    <div class="text_banner maroon">
+    <div class="h1">
+    </div>
+    </div>
     <div class="items">
       {% if chat_comments %}
         {% for comment in chat_comments.object_list %}
             <div class="item comment no-pic">
-                <div class="meta">
-                    <div class="title">{{ comment.name }}</div>
-                    <div class="stamp">{{ comment.submit_date }} | {% likes comment %} {% report_comment_abuse comment %}</a></div>
-                    <div class="stamp">{{ comment.comment|linebreaks }}</div>
-                </div>
+              <div class="meta">
 
-                {% if comment.livechatresponse_set.exists %}
-                <div class="item comment" style="padding-left: 15px">
-                    {% for response in comment.livechatresponse_set.all %}
-                        <div class="meta">
-                            <div class="title">
-                                Response by:
-                                {{ response.author.username }}
-                            </div>
-                            <div class="stamp">{{ response.updated_at }}</div>
-                            <div class="stamp">{{ response.response }}</div>
-                        </div>
-                    {% endfor %}
-                </div>
-                {% endif %}
+                {% if comment.user %}
+                  <b><a href="{% url public_profile comment.user.id %}">{{ comment.name }}</a></b>
+                  {% else %}
+                  {{ comment.name }}
+                  {% endif %} asked at {{ comment.submit_date.time }}
+                <div class="stamp">{{ comment.comment|linebreaks }}</div>
+              </div>
+
+              {% if comment.livechatresponse_set.exists %}
+              <div class="item comment" style="background-color: rgb(244, 229, 234)">
+                  {% for response in comment.livechatresponse_set.all %}
+                      <div class="meta">
+                              <b><a href="{% url public_profile response.author.id %}">
+                                  {{ response.author.username }}</a></b>
+                       replied to
+                          {% if comment.user %}
+                  <b><a href="{% url public_profile comment.user.id %}">{{ comment.name }}</a></b>
+                  {% else %}
+                  {{ comment.name }}
+                  {% endif %} at {{ response.updated_at.time }}
+                          <div class="stamp">{{ response.response }}</div>
+                      </div>
+                  {% endfor %}
+              </div>
+              {% endif %}
 
             </div>
         {% endfor %}
@@ -68,17 +112,7 @@
       {% endif %}
     </div>
 
-    {% if live_chat.can_render_comment_form %}
-        {% render_comment_form for live_chat.current_live_chat %}
-    {% else %}
-        {% if live_chat.can_comment_code == 'auth_required' %}
-        <div style="padding: 10px">
-            <a href="{% url login %}?next={{ request.META.PATH_INFO }}">
-                Sign in to comment or ask a question
-            </a>
-        </div>
-        {% endif %}
-    {% endif %}
+
 
   </div>
 </div>

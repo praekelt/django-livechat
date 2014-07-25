@@ -3,15 +3,29 @@
   <div class="banner_content live_chat">
     <div>
       <strong>
-        <a href="{{ live_chat_advert.url }}">Live Chat:</a>
-        {{ live_chat_advert.title }}
+      {% if live_chat_advert.cancelled %}
+          Apologies the Live Chat with {{ live_chat_advert.expert }} on {{ live_chat_advert.title }}
+          has been cancelled due to unforeseen circumstances.
+          {% else %}
+      {% if live_chat_advert.commenting_closed %}
+          Live Chat with {{ live_chat_advert.expert }}
+         on {{ live_chat_advert.title }} is now closed.<br/>
+          <a href="{{ live_chat_advert.url }}">Click here to view questions and answers...</a>
+          {% else %}
+        Join us for Live Chat with {{ live_chat_advert.expert }}
+        on {{ live_chat_advert.title }}
+
+        {% if not live_chat_advert.in_progress %}
+        at {{ live_chat_advert.datetime.time }} on {{ live_chat_advert.datetime.date }}<br/>
+          <a href="{{ live_chat_advert.url }}">Find out more</a>
+            {% else %}
+            on NOW!<br/>
+            <a href="{{ live_chat_advert.url }}">Click here to participate</a>
+        {% endif %}
+      {% endif %}
+      {% endif %}
       </strong>
     </div>
-    {% if live_chat_advert.description %}
-    <div class="live_chat_description">
-      {{ live_chat_advert.description }}
-    </div>
-    {% endif %}
   </div>
 </div>
 {% endif %}

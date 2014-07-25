@@ -1,0 +1,12 @@
+language: python
+python:
+  - "2.7"
+env:
+  - DJANGO_SETTINGS_MODULE=test_settings
+install:
+  - "pip install coverage coveralls"
+  - "pip install -e ."
+script:
+  - coverage run --source='livechat' `which django-admin.py` test livechat
+after_success:
+  - coveralls

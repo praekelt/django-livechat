@@ -15,10 +15,11 @@ class LiveChatArchiveView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(LiveChatArchiveView, self).get_context_data(**kwargs)
+        comments = self.object.comment_set().filter(livechatresponse__isnull=False)
         request = self.request
         try:
             paginator = Paginator(
-                self.object.comment_set(),
+                comments,
                 per_page=10)
             context['chat_comments'] = paginator.page(request.GET.get('p', 1))
         except (KeyError, AttributeError):

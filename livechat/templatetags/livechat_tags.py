@@ -27,16 +27,21 @@ def live_chat_banner(context):
     if chat is not None:
         context['live_chat_advert'] = {
             'title': chat.title,
-            'description': chat.description
-        }
-        if chat.is_in_progress():
-            context['live_chat_advert']['url'] = reverse(
+            'description': chat.description,
+            'expert': chat.expert,
+            'commenting_closed': chat.comments_closed,
+            'cancelled': chat.is_cancelled,
+            'in_progress': chat.is_in_progress(),
+            'url':  reverse(
                 'livechat:show_livechat',
                 kwargs={
                     'slug': chat.slug
                 })
-        else:
-            context['live_chat_advert']['url'] = reverse('askmama_detail')
+        }
+        context['live_chat_advert']['datetime'] = {
+            'time': chat.chat_starts_at.time,
+            'date': chat.chat_starts_at.date
+            }
     return context
 
 
@@ -46,11 +51,16 @@ def show_live_chat(context):
     context = copy(context)
     request = context['request']
 
+    chat = LiveChat.chat_finder.upcoming_live_chat()
+    context['live_chat'] = chat
+    context['can_comment'] = chat.is_in_progress()
+
     try:
         paginator = Paginator(
-            context['live_chat']['current_live_chat'].comment_set(),
+            context['live_chat'].comment_set(),
             per_page=10)
         context['chat_comments'] = paginator.page(request.GET.get('p', 1))
+        context['commenting_closed'] = chat.comments_closed
     except (KeyError, AttributeError):
         pass
 
@@ -78,6 +88,7 @@ def show_last_live_chat(context):
         context['last_live_chat'] = {
             'title': chat.title,
             'chat_ends_at': chat.chat_ends_at,
+            'expert': chat.expert,
             'url': reverse('livechat:show_archived_livechat',
                            kwargs={
                                'slug': chat.slug

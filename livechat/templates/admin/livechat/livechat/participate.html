@@ -56,16 +56,28 @@
             <label><strong>Title:</strong></label>
             <p>
                 {{livechat.title}}
-            </p>
+            </p><br/>
+            <label><strong>Expert:</strong></label>
+            <p>
+                {{livechat.expert}}
+            </p><br/>
             <label><strong>Description:</strong></label>
             <p>
                 {{livechat.description|safe|linebreaks}}
-            </p>
+            </p><br/>
+            <label><strong>Chat starts at:</strong></label>
+            <p>
+                {{livechat.chat_starts_at}}
+            </p><br/>
+            <label><strong>Maximum questions to accept:</strong></label>
+            <p>
+                {{livechat.maximum_questions}}
+            </p><br/>
         </div>
         <div>
             <ul>
-                <li><a href="?">Show all questions</a></li>
-                <li><a href="?answered=false">Show all unanswered questions</a></li>
+                <li><a href="?">Show all questions </a>({{ livechat.comment_set.count }}/{{ livechat.maximum_questions }})</li>
+                <li><a href="?answered=false">Show all unanswered questions </a>{{ unanswered_count }}</li>
             </ul>
         </div>
     </field>
