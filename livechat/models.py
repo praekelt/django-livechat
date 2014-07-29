@@ -141,9 +141,10 @@ class LiveChat(ModelBase):
         return qs
 
     def check_max_comments(self):
-        if self.comment_set().count >= int(self.maximum_questions)-1:
-            self.comments_closed = True
-            self.save()
+        if self.maximum_questions is not None:
+            if self.comment_set().count >= int(self.maximum_questions)-1:
+                self.comments_closed = True
+                self.save()
 
 
     def is_in_progress(self):
