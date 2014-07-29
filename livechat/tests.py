@@ -194,11 +194,16 @@ class LiveChatTestCase(unittest.TestCase):
                                        chat_ends_at=now - timedelta(days=1),
                                        )
 
-        # 2. Change max_questions to 0
+        # 2. Test method doesn't crash if none
+        chat.maximum_questions = None
+        chat.save()
+        chat.check_max_comments()
+
+        # 3. Change max_questions to 0
         chat.maximum_questions = 0
         chat.save()
 
-        # 3. Test commenting closed
+        # 4. Test commenting closed
         chat.check_max_comments()
         self.assertTrue(chat.comments_closed)
 
