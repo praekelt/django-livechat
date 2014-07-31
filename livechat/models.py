@@ -142,7 +142,7 @@ class LiveChat(ModelBase):
 
     def check_max_comments(self):
         if self.maximum_questions is not None:
-            if self.comment_set().count >= int(self.maximum_questions)-1:
+            if self.comment_set().count() >= int(self.maximum_questions)-1:
                 self.comments_closed = True
                 self.save()
 
