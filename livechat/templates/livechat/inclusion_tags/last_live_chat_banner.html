@@ -1,13 +1,6 @@
-{% if last_live_chat %}
-<div class="text_banner">
-  <div class="banner_content live_chat">
+<div class="post">
     <div>
-      <strong>
-          Did you miss the Live Chat with {{ last_live_chat.expert }} on {{ last_live_chat.title }}?<br/>
-        <a href="{{ last_live_chat.url }}">Catch up on the answers here</a>
-
-      </strong>
+      <strong><a href="{{ url }}">Live Chat Archive</a></strong><br/>
+    <p>Did you miss a Live Chat? View past Live Chats questions and answers here.</p>
     </div>
-  </div>
 </div>
-{% endif %}

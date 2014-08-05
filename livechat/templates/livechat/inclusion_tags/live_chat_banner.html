@@ -1,3 +1,16 @@
+{% if last_live_chat %}
+<div class="text_banner">
+  <div class="banner_content live_chat">
+    <div>
+      <strong>
+          Did you miss the Live Chat with {{ last_live_chat.expert }} on {{ last_live_chat.title }}?<br/>
+        <a href="{{ last_live_chat.url }}">Catch up on the answers here</a>
+
+      </strong>
+    </div>
+  </div>
+</div>
+{% endif %}
 {% if live_chat_advert %}
 <div class="text_banner">
   <div class="banner_content live_chat">
