@@ -8,18 +8,17 @@
 
 <div class="text_banner maroon">
   <div class="h1">LIVE CHAT ARCHIVE</div>
-
-<div class="banner_content live_chat">
-    <div>
-      <strong>{{ object.title }}<br/></strong>
-       {{ object.expert }}<br/>
-       {{ object.chat_starts_at.time }} on {{ object.chat_starts_at.date }}<br/>
-    </div>
-</div>
-    <div class="h1"> </div>
     <div class="items">
-      {% if chat_comments %}
-        {% for comment in chat_comments.object_list %}
+      {% if livechats %}
+        {% for livechat in livechats.object_list %}
+            <div class="banner_content live_chat">
+            <div>
+            <strong>{{ livechat.title }}<br/></strong>
+            {{ livechat.expert }}<br/>
+            {{ livechat.chat_starts_at.time }} on {{ livechat.chat_starts_at.date }}<br/>
+            </div>
+            </div>
+            {% for comment in livechat.comment_set %}
             {% if comment.livechatresponse_set.exists %}
             <div class="item comment no-pic">
               <div class="meta">
@@ -45,24 +44,25 @@
                   {% endif %} at {{ response.updated_at.time }}
                           <div class="stamp">{{ response.response }}</div>
                       </div>
+
                   {% endfor %}
               </div>
               {% endif %}
-
+             {% endfor %}
             </div>
         {% endfor %}
 
         <div class="pagination">
-          {% if chat_comments.has_previous %}
-              <span><a href="?p={{chat_comments.previous_page_number}}&amp;answered={{answered}}&amp;popular={{popular}}">Previous</a></span> |
+          {% if livechats.has_previous %}
+              <span><a href="?p={{livechats.previous_page_number}}&amp;answered={{answered}}&amp;popular={{popular}}">Previous</a></span> |
           {% else %}
               <span>Previous</span> |
           {% endif %}
           <span class="current">
-              Page {{ chat_comments.number }} of {{ chat_comments.paginator.num_pages }}
+              Page {{ livechats.number }} of {{ livechats.paginator.num_pages }}
           </span>
-          {% if chat_comments.has_next %}
-              | <span><a href="?p={{chat_comments.next_page_number}}&amp;answered={{answered}}&amp;popular={{popular}}">Next</a></span>
+          {% if livechats.has_next %}
+              | <span><a href="?p={{livechats.next_page_number}}&amp;answered={{answered}}&amp;popular={{popular}}">Next</a></span>
           {% else %}
               | <span>Next</span>
           {% endif %}

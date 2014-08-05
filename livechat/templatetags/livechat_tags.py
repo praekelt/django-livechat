@@ -23,6 +23,17 @@ def live_chat_banner(context):
     # Find any upcoming or current live chat. The Chat date must be less than 5
     # days away, or currently in progress.
 
+    oldchat = LiveChat.chat_finder.get_last_live_chat()
+
+    if oldchat:
+        context['last_live_chat'] = {
+            'title': oldchat.title,
+            'chat_ends_at': oldchat.chat_ends_at,
+            'expert': oldchat.expert,
+            'url': reverse('livechat:show_archived_livechat')
+
+        }
+
     chat = LiveChat.chat_finder.upcoming_live_chat()
     if chat is not None:
         context['live_chat_advert'] = {
@@ -81,18 +92,7 @@ def get_livechat_for_article(context, post, var_name):
 
 @register.inclusion_tag('livechat/inclusion_tags/last_live_chat_banner.html',
                         takes_context=True)
-def show_last_live_chat(context):
+def archive_live_chat(context):
     context = copy(context)
-    chat = LiveChat.chat_finder.get_last_live_chat()
-    if chat:
-        context['last_live_chat'] = {
-            'title': chat.title,
-            'chat_ends_at': chat.chat_ends_at,
-            'expert': chat.expert,
-            'url': reverse('livechat:show_archived_livechat',
-                           kwargs={
-                               'slug': chat.slug
-                           })
-
-        }
+    context['url'] = reverse('livechat:show_archived_livechat')
     return context
