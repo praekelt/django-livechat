@@ -28,4 +28,4 @@ class LiveChatArchiveView(DetailView):
         return context
 
     def get_object(self):
-        return LiveChat.objects.all()
+        return LiveChat.objects.filter(is_cancelled=False)
