@@ -61,11 +61,7 @@
             <div class="item comment no-pic">
               <div class="meta">
 
-                {% if comment.user %}
-                  <b><a href="{% url public_profile comment.user.id %}">{{ comment.name }}</a></b>
-                  {% else %}
-                  {{ comment.name }}
-                  {% endif %} asked at {{ comment.submit_date.time }}
+                <b>{{ comment.name }}</b> asked at {{ comment.submit_date.time }}
                 <div class="stamp">{{ comment.comment|linebreaks }}</div>
               </div>
 
@@ -73,14 +69,9 @@
               <div class="item comment" style="background-color: rgb(244, 229, 234)">
                   {% for response in comment.livechatresponse_set.all %}
                       <div class="meta">
-                              <b><a href="{% url public_profile response.author.id %}">
-                                  {{ response.author.username }}</a></b>
+                              <b>{{ response.author.username }}</b>
                        replied to
-                          {% if comment.user %}
-                  <b><a href="{% url public_profile comment.user.id %}">{{ comment.name }}</a></b>
-                  {% else %}
-                  {{ comment.name }}
-                  {% endif %} at {{ response.updated_at.time }}
+                          <b>{{ comment.name }}</b> at {{ response.updated_at.time }}
                           <div class="stamp">{{ response.response }}</div>
                       </div>
                   {% endfor %}
