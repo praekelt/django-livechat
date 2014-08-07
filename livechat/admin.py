@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.contrib import admin
 from django.core.paginator import Paginator
 
+from datetime import datetime
 from jmbo.admin import ModelBaseAdmin, ModelBaseAdminForm
 
 from livechat.models import LiveChat, LiveChatResponse
@@ -89,6 +90,11 @@ class LiveChatAdmin(ModelBaseAdmin):
             comments_qs = comments_qs.filter(livechatresponse__isnull=True)
         if popular == 'true':
             comments_qs = comments_qs.order_by('-like_count')
+
+        if 'archive' in request.GET:
+            livechat.chat_ends_at = datetime.now()
+            livechat.save()
+
 
         paginator = Paginator(comments_qs, 100)
         comments = paginator.page(request.GET.get('p', 1))

@@ -69,7 +69,7 @@
               <div class="item comment" style="background-color: rgb(244, 229, 234)">
                   {% for response in comment.livechatresponse_set.all %}
                       <div class="meta">
-                              <b>{{ response.author.username }}</b>
+                              <b>{{ response.author.first_name }} {{ response.author.last_name }}</b>
                        replied to
                           <b>{{ comment.name }}</b> at {{ response.updated_at.time }}
                           <div class="stamp">{{ response.response }}</div>
