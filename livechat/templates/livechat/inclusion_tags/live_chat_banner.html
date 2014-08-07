@@ -20,7 +20,11 @@
           Apologies the Live Chat with {{ live_chat_advert.expert }} on {{ live_chat_advert.title }}
           has been cancelled due to unforeseen circumstances.
           {% else %}
-      {% if live_chat_advert.commenting_closed or live_chat_advert.archived %}
+          {% if live_chat_advert.archived %}
+          Did you miss the Live Chat with {{ live_chat_advert.expert }} on {{ live_chat_advert.title }}?<br/>
+          <a href="{{ live_chat_advert.archive_url }}">Read the questions & answers here... </a>
+          {% else %}
+      {% if live_chat_advert.commenting_closed %}
           Live Chat with {{ live_chat_advert.expert }}
          on {{ live_chat_advert.title }} is now closed.<br/>
           <a href="{{ live_chat_advert.url }}">Click here to view questions and answers...</a>
@@ -35,6 +39,7 @@
             on NOW!<br/>
             <a href="{{ live_chat_advert.url }}">Click here to participate</a>
         {% endif %}
+          {% endif %}
       {% endif %}
       {% endif %}
       </strong>

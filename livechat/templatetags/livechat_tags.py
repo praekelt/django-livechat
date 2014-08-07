@@ -47,8 +47,9 @@ def live_chat_banner(context):
             'url':  reverse(
                 'livechat:show_livechat',
                 kwargs={
-                    'slug': chat.slug
-                })
+                    'slug': chat.slug}),
+            'archive_url':reverse('livechat:show_archived_livechat')
+
         }
         context['live_chat_advert']['datetime'] = {
             'time': chat.chat_starts_at.time,
