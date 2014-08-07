@@ -42,6 +42,7 @@ def live_chat_banner(context):
             'expert': chat.expert,
             'commenting_closed': chat.comments_closed,
             'cancelled': chat.is_cancelled,
+            'archived': chat.is_archived,
             'in_progress': chat.is_in_progress(),
             'url':  reverse(
                 'livechat:show_livechat',

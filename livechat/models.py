@@ -118,6 +118,10 @@ class LiveChat(ModelBase):
         help_text="Indicating whether or not the live chat has been cancelled"
     )
 
+    is_archived = models.BooleanField(
+        default=False,
+        help_text="Indicating whether or not the live chat has been archived"
+    )
     objects = models.Manager()
     chat_finder = LiveChatManager()
 

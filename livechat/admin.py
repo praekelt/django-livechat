@@ -92,7 +92,7 @@ class LiveChatAdmin(ModelBaseAdmin):
             comments_qs = comments_qs.order_by('-like_count')
 
         if 'archive' in request.GET:
-            livechat.chat_ends_at = datetime.now()
+            livechat.is_archived = True
             livechat.save()
 
 

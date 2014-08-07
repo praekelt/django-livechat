@@ -20,7 +20,7 @@
           Apologies the Live Chat with {{ live_chat_advert.expert }} on {{ live_chat_advert.title }}
           has been cancelled due to unforeseen circumstances.
           {% else %}
-      {% if live_chat_advert.commenting_closed %}
+      {% if live_chat_advert.commenting_closed or live_chat_advert.archived %}
           Live Chat with {{ live_chat_advert.expert }}
          on {{ live_chat_advert.title }} is now closed.<br/>
           <a href="{{ live_chat_advert.url }}">Click here to view questions and answers...</a>
