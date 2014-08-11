@@ -47,8 +47,8 @@ class LiveChatAdmin(ModelBaseAdmin):
         }),
     )
     list_display = (
-        'title', 'subtitle', 'chat_starts_at',
-        '_get_absolute_url', 'owner', 'created', '_actions'
+        'title', 'subtitle', 'owner', 'publish_on',
+        'chat_starts_at', 'retract_on', '_actions', 'is_archived'
     )
 
     def cancel_live_chat(self, request, queryset):
