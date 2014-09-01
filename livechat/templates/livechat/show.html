@@ -9,3 +9,11 @@
 {% block content %}
 {% show_live_chat %}
 {% endblock %}
+{% block footer_search_form %}
+            <div class="h1">Search</div>
+            <form id="frmSearch" method="get" action="{% url haystack_search_askmama %}">
+                <div class="row"><input type="text" name="q" value="{{ query }}" class="short" /></div>
+                <div class="row"><input type="submit" name="submit" value="Search" class="btn" /></div>
+                <div class="clear"></div>
+            </form>
+{% endblock %}
