@@ -1,0 +1,144 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_list admin_static %}
+{% load url from future %}
+{% load admin_urls %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" 
+        href="{% static "admin/css/forms.css" %}" />
+    <link rel="stylesheet" type="text/css" 
+        href="{% static "admin/css/changelists.css" %}" />
+    <script type="text/javascript" 
+        src="{% static "admin/js/admin/RelatedObjectLookups.js" %}"></script>
+    <script type="text/javascript" 
+        src="{% static "admin/js/jquery.js" %}"></script>
+
+    <script type="text/javascript" charset="utf-8">
+        /*
+
+        BEWARE!
+
+        I am overriding dismissAddAnotherPopup as defined in RelatedObjectLookups
+        so I can add custom behaviour instead of inputting the value
+        into a form field.
+
+        I want to fire off an AJAX request to load the live with responses
+        after having saved them.
+
+        */
+        function dismissAddAnotherPopup(win, newId, newRepr) {
+            // newId and newRepr are expected to have previously been escaped by
+            // django.utils.html.escape.
+            newId = html_unescape(newId);
+            newRepr = html_unescape(newRepr);
+            var name = windowname_to_id(win.name);
+            var id = name.split("_")[1];
+            $('#' + name + '_responses').load('{% url 'admin:participate_responses' pk=livechat.pk %}?comment_id='+id);
+            win.close();
+        }
+    </script>
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="/admin/">{% trans 'Home' %}</a> &rsaquo;
+    <a href="../../../">{{ app_label|capfirst }}</a> &rsaquo;
+    <a href="../../">{{ module_name|capfirst }}</a> &rsaquo;
+    {{livechat.title}}
+</div>
+{% endblock %}
+
+{% block content %}
+<div>
+    <field class="module aligned">
+        <div class="form-row livechat_comment">
+            <label><strong>Title:</strong></label>
+            <p>
+                {{livechat.title}}
+            </p><br/>
+            <label><strong>Expert:</strong></label>
+            <p>
+                {{livechat.expert}}
+            </p><br/>
+            <label><strong>Description:</strong></label>
+            <p>
+                {{livechat.description|safe|linebreaks}}
+            </p><br/>
+            <label><strong>Chat starts at:</strong></label>
+            <p>
+                {{livechat.chat_starts_at}}
+            </p><br/>
+            <label><strong>Maximum questions to accept:</strong></label>
+            <p>
+                {{livechat.maximum_questions}}
+            </p><br/>
+        </div>
+        <div>
+            <ul>
+                <li><a href="?">Show all questions </a>({{ livechat.comment_set.count }}/{{ livechat.maximum_questions }})</li>
+                <li><a href="?answered=false">Show all unanswered questions </a>{{ unanswered_count }}</li>
+            </ul>
+        </div>
+        <div>
+            <ul>
+                <a href="?archive"><button>Archive Live Chat</button></a>
+            </ul>
+        </div>
+    </field>
+</div>
+
+{% for comment in comments.object_list %}
+<div>
+	<fieldset class="module aligned ">
+		<div class="form-row livechat_comment ">
+			<div>
+                <label><strong>Author:</strong></label>
+                <p>
+                    <a href="{% url 'admin:livechat_livechatresponse_add' %}?comment={{comment.pk}}&amp;livechat={{livechat.pk}}" class="add-another" id="add_livechatresponse_{{comment.pk}}_id" onclick="return showAddAnotherPopup(this);">
+                        Respond to:
+                        {{ comment.user.username }}
+                    </a>
+                </p>
+                <label><strong>Comment:</strong></label>
+                <p>{{comment.comment}}</p>
+                <label><strong>Time posted:</strong></label>
+                <p>{{comment.submit_date}}</p>
+            </div>
+            <div id="livechatresponse_{{comment.pk}}_id_responses">
+                {% include "admin/livechat/livechat/participate_responses.html" %}
+            </div>
+		</div>
+	</fieldset>
+	{% csrf_token %}
+</div>
+{% empty %}
+<div>
+    <fieldset class="module aligned ">
+        <div class="form-row livechat_comment ">
+            <div>
+                No questions to display.
+            </div>
+        </div>
+    </fieldset>
+</div>
+{% endfor %}
+
+<div id="changelist">
+    <p class="paginator">
+        {% if comments.has_previous %}
+            <a href="{% url 'admin:livechat' pk=livechat.pk %}?page={{comments.previous_page_number}}">previous page</a>
+        {% endif %}
+
+        <span>
+            Page {{ comments.number }} of {{ comments.paginator.num_pages }}
+        </span>
+
+        {% if comments.has_next %}
+            <a href="{% url 'admin:livechat' pk=livechat.pk %}?page={{comments.next_page_number}}">next page</a>
+        {% endif %}
+        <br/>
+        Total questions: {{comments.object_list.count}}
+    </p>
+</div>
+{% endblock %}

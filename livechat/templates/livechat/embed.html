@@ -1,0 +1,20 @@
+{% load jmbo_inclusion_tags jmbo_template_tags %}
+{% load comments likes_inclusion_tags %}
+
+<div class="maroon">
+  <div class="h1">
+    {{livechat.title}}
+    <div class="stamp">
+        {% humanize_time_diff livechat.created "Ago" %} // <a href="#comments">{{ livechat.comment_count }} Comments</a> // {% likes livechat %}
+    </div>
+  </div>
+
+  <div class="content-inner">
+    <div class="post">
+      {{ livechat.description|safe }}
+    </div>
+
+    {% object_comments livechat %}
+
+  </div>
+</div>

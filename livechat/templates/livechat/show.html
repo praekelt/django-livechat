@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% load livechat_tags %}
+
+{% block above_content %}
+{{ block.super }}
+{% endblock %}
+
+{% block content %}
+{% show_live_chat %}
+{% endblock %}

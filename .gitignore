@@ -1,4 +1,13 @@
+*.pyc
+*.swp
+*.egg-info
 *.log
 *.pot
-*.pyc
 local_settings.py
+*.egg
+pep8.txt
+coverage.xml
+.coverage
+ve/
+htmlcov/
+

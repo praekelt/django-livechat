@@ -1,0 +1,49 @@
+{% if last_live_chat %}
+<div class="text_banner">
+  <div class="banner_content live_chat">
+    <div>
+      <strong>
+          Did you miss the Live Chat with {{ last_live_chat.expert }} on {{ last_live_chat.title }}?<br/>
+        <a href="{{ last_live_chat.url }}">Catch up on the answers here</a>
+
+      </strong>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% if live_chat_advert %}
+<div class="text_banner">
+  <div class="banner_content live_chat">
+    <div>
+      <strong>
+      {% if live_chat_advert.cancelled %}
+          Apologies the Live Chat with {{ live_chat_advert.expert }} on {{ live_chat_advert.title }}
+          has been cancelled due to unforeseen circumstances.
+          {% else %}
+          {% if live_chat_advert.archived %}
+          Did you miss the Live Chat with {{ live_chat_advert.expert }} on {{ live_chat_advert.title }}?<br/>
+          <a href="{{ live_chat_advert.archive_url }}">Read the questions & answers here... </a>
+          {% else %}
+      {% if live_chat_advert.commenting_closed %}
+          Live Chat with {{ live_chat_advert.expert }}
+         on {{ live_chat_advert.title }} is now closed.<br/>
+          <a href="{{ live_chat_advert.url }}">Click here to view questions and answers...</a>
+          {% else %}
+        Join us for Live Chat with {{ live_chat_advert.expert }}
+        on {{ live_chat_advert.title }}
+
+        {% if not live_chat_advert.in_progress %}
+        at {{ live_chat_advert.datetime.time }} on {{ live_chat_advert.datetime.date }}<br/>
+          <a href="{{ live_chat_advert.url }}">Find out more</a>
+            {% else %}
+            NOW!<br/>
+            <a href="{{ live_chat_advert.url }}">Click here to participate</a>
+        {% endif %}
+          {% endif %}
+      {% endif %}
+      {% endif %}
+      </strong>
+    </div>
+  </div>
+</div>
+{% endif %}

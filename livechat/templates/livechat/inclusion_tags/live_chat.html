@@ -1,0 +1,109 @@
+{% load jmbo_inclusion_tags jmbo_template_tags %}
+{% load comments likes_inclusion_tags moderator_inclusion_tags %}
+{% load livechat_tags mama_inclusion_tags %}
+
+
+
+
+<div class="text_banner maroon">
+    <div class="h1">
+    LIVE CHAT
+</div>
+  <div class="banner_content live_chat">
+    <div>
+      <strong>{{ live_chat.title }}<br/></strong>
+       {{ live_chat.expert }}<br/>
+       {{ live_chat.chat_starts_at.time }} on {{ live_chat.chat_starts_at.date }}<br/>
+    </div>
+</div>
+
+  <div class="content-inner">
+    <div class="post">
+      {{ live_chat.description|safe|linebreaks }}
+    </div>
+
+   {% if commenting_closed %}
+        <div class="post">
+        <b>We have reached the maximum number of questions for this live chat.
+            Comments have therefore been closed</b><br/>
+        </div>
+
+        <div class="post">
+        <b>Didn't get your question answered?</b><br/>
+        <a href="{% url askmama_detail %}">Visit askMAMA and ask there</a>
+        </div>
+        {% else %}
+            {% if can_comment %}
+                {% render_comment_form for live_chat %}
+                <script type="text/javascript"
+        src="{{ STATIC_URL }}livechat_change_question.js">
+</script>
+            {% else %}
+                <div class="post">
+                <b>Comments will open when live chat begins</b>
+                </div>
+            {% endif %}
+        {% if live_chat.can_comment_code == 'auth_required' %}
+        <div style="padding: 10px">
+            <a href="{% url login %}?next={{ request.META.PATH_INFO }}">
+                Sign in to comment or ask a question
+            </a>
+        </div>
+        {% endif %}
+    {% endif %}
+    <div class="text_banner maroon">
+    <div class="h1">
+    </div>
+    </div>
+    <div class="items">
+      {% if chat_comments %}
+        {% for comment in chat_comments.object_list %}
+            <div class="item comment no-pic">
+              <div class="meta">
+
+                <b>{{ comment.name }}</b> asked at {{ comment.submit_date.time }}
+                <div class="stamp">{{ comment.comment|linebreaks }}</div>
+              </div>
+
+              {% if comment.livechatresponse_set.exists %}
+              <div class="item comment" style="background-color: rgb(244, 229, 234)">
+                  {% for response in comment.livechatresponse_set.all %}
+                      <div class="meta">
+                              <b>{{ response.author.first_name }} {{ response.author.last_name }}</b>
+                       replied to
+                          <b>{{ comment.name }}</b> at {{ response.updated_at.time }}
+                          <div class="stamp">{{ response.response }}</div>
+                      </div>
+                  {% endfor %}
+              </div>
+              {% endif %}
+
+            </div>
+        {% endfor %}
+
+        <div class="pagination">
+          {% if chat_comments.has_previous %}
+              <span><a href="?p={{chat_comments.previous_page_number}}&amp;answered={{answered}}&amp;popular={{popular}}">Previous</a></span> |
+          {% else %}
+              <span>Previous</span> |
+          {% endif %}
+          <span class="current">
+              Page {{ chat_comments.number }} of {{ chat_comments.paginator.num_pages }}
+          </span>
+          {% if chat_comments.has_next %}
+              | <span><a href="?p={{chat_comments.next_page_number}}&amp;answered={{answered}}&amp;popular={{popular}}">Next</a></span>
+          {% else %}
+              | <span>Next</span>
+          {% endif %}
+        </div>
+      {% else %}
+        <div class="post">
+          No questions yet. Go ahead and ask a question.
+        </div>
+      {% endif %}
+    </div>
+
+
+
+  </div>
+</div>
