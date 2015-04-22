@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='django-livechat',
-    version='dev',
+    version='1.0.0',
     description='Very Simple Live Chat Django Application',
     long_description = open('README.md', 'r').read() + \
             open('AUTHORS.md', 'r').read() + open('CHANGELOG.md', 'r').read(),
