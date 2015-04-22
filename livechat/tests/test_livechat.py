@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
+import pytest
+
 from datetime import datetime, timedelta
 
 from django.utils import unittest
@@ -23,6 +25,7 @@ class MockRequest(object):
     pass
 
 
+@pytest.mark.django_db
 class LiveChatTestCase(unittest.TestCase):
 
     def setUp(self):
