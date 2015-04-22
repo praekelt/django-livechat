@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='django-livechat',
-    version='1.0.0',
+    version='1.0.1',
     description='Very Simple Live Chat Django Application',
     long_description = open('README.md', 'r').read() + \
             open('AUTHORS.md', 'r').read() + open('CHANGELOG.md', 'r').read(),
@@ -16,7 +16,11 @@ setup(
     install_requires = [
         'django==1.4.5',
         'south==0.8.1',
-        'jmbo==0.5.5'
+        'jmbo==0.5.5',
+        'pytest',
+        'pytest-django',
+        'pytest-cov',
+        'pytest-xdist',
     ],
     tests_require=[
         'django-setuptest==0.1.4',

@@ -1,7 +1,7 @@
-include AUTHORS.rst
+include AUTHORS.md
 include LICENSE
-include README.rst
-include CHANGELOG.rst
+include README.md
+include CHANGELOG.md
 include doc
 include livechat
 recursive-include livechat/static *

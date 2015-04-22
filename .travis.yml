@@ -7,6 +7,6 @@ install:
   - "pip install coverage coveralls"
   - "pip install -e ."
 script:
-  - coverage run --source='livechat' `which django-admin.py` test livechat
+  - py.test -s --ds=test_settings --verbose --cov ./livechat livechat
 after_success:
   - coveralls
